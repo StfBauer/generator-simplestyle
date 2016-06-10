@@ -1,6 +1,7 @@
 'use strict';
 var chalk = require('chalk'),
-    mkdirp = require('mkdirp');;
+    mkdirp = require('mkdirp'),
+    fs = require('fs');
 
 
 module.exports = {
@@ -10,8 +11,17 @@ module.exports = {
         if (folderList.length !== null) {
             for (var i = 0; i < folderList.length; i++) {
                 try {
-                    mkdirp(folderList[i]);
-                    console.log(chalk.green("   Folder created: ") + folderList[i]);
+                    if (!fs.existsSync(folderList[i])) {
+
+                        mkdirp(folderList[i]);
+                        console.log(chalk.green("   Folder created: ") + folderList[i]);
+
+                    } else {
+
+                        console.log(chalk.cyan("identical ") + folderList[i]);
+
+                    }
+
                 } catch (error) {
                     console.log(chalk.red("   Error: ") + error);
                 }

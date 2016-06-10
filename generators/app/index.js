@@ -33,6 +33,16 @@ module.exports = generators.Base.extend({
                 name: 'atomic',
                 message: 'Should folders for atomic design be created?',
                 default: true
+            }, {
+                type: 'confirm',
+                name: 'https',
+                message: 'Should web server configure to use HTTPS?',
+                default: true
+            }, {
+                type: 'confirm',
+                name: 'sass',
+                message: 'Should SASS support be enabled?',
+                default: true
             }
         ]).then(function(answers) {
 
@@ -65,14 +75,80 @@ module.exports = generators.Base.extend({
                 helper.createFolder(atomicFolder);
             }
         },
-        doSomething: function() {
+        copyHtmlFiles: function() {
 
             this.fs.copyTpl(
 
                 this.templatePath('index.html'),
-                this.destinationPath('public/index.html'), {
+                this.destinationPath('app/index.html'), {
                     title: 'Templating with Yeoman'
                 }
+            );
+
+        },
+        copyStyles: function() {
+
+            if (this.options.ssgSettings.sass) {
+
+                this.fs.copyTpl(
+                    this.templatePath('main.css'),
+                    this.destinationPath('app/styles/main.scss'), {
+                        bowerComponents: '// bower:scss\r\n// endbower'
+                    }
+                );
+
+            } else {
+
+                this.fs.copyTpl(
+                    this.templatePath('main.css'),
+                    this.destinationPath('app/styles/main.css'), {
+                        bowerComponents: ''
+                    }
+                );
+
+            }
+        },
+        copyLibraries: function() {
+
+            this.fs.copyTpl(
+                this.templatePath('ssgCore.templates.js'),
+                this.destinationPath('libs/ssgCore.templates.js'), {}
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('ssgCoreLib.js'),
+                this.destinationPath('libs/scripts/ssgCoreLib.js'), {}
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('ssgCore.css'),
+                this.destinationPath('libs/styles/ssgCore.css'), {}
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('corev15.css'),
+                this.destinationPath('libs/styles/corev15.css'), {}
+            );
+
+
+        },
+        copyCore: function() {
+
+            this.fs.copyTpl(
+                this.templatePath('gulp.config'),
+                this.destinationPath('gulp.config.js'), {}
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('gulpfile.txt'),
+                this.destinationPath('gulpfile.js'), {
+                    contents: '<%= contents %>'
+                }
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('package.json'),
+                this.destinationPath('package.json'), {}
             );
 
         }
