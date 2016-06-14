@@ -14,7 +14,7 @@ module.exports = {
                     if (!fs.existsSync(folderList[i])) {
 
                         mkdirp(folderList[i]);
-                        console.log(chalk.green("   Folder created: ") + folderList[i]);
+                        console.log(chalk.green("   create ") + folderList[i]);
 
                     } else {
 

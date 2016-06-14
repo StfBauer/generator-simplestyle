@@ -10,10 +10,10 @@ var gulp = require('gulp'),
     args = require('yargs').argv,
 
     // custom plugins for simple style guide
-    helper = require('./ssg-core/lib/helper'),
+    helper = require('./libs/helper'),
     config = require('./gulp.config'),
-    ssgCoreConfig = require('./ssg-core/lib/gen-config'),
-    ssgCoreCompile = require('./ssg-core/lib/precomp-pattern');
+    ssgCoreConfig = require('./libs/gen-config'),
+    ssgCoreCompile = require('./libs/precomp-pattern');
 
 // Contants
 var reload = browserSync.reload;
@@ -267,10 +267,11 @@ gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core'
         notify: false,
         port: 9000,
         server: {
-            baseDir: ['.tmp', 'app'],
+            baseDir: ['libs', '.tmp', 'app'],
             routes: {
                 '/bower_components': 'bower_components',
-                '/tmp': '/'
+                '/tmp': '/',
+                '/lib': '/'
             }
         },
         https: true

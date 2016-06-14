@@ -67,15 +67,15 @@ module.exports = generators.Base.extend({
                     'app/styles/molecules',
                     'app/styles/templates',
                     'app/styles/pages',
-                    'app/patterns/atoms',
-                    'app/patterns/molecules',
-                    'app/patterns/templates',
-                    'app/patterns/pages'
+                    'app/_pattern/atoms',
+                    'app/_pattern/molecules',
+                    'app/_pattern/templates',
+                    'app/_pattern/pages'
                 ];
                 helper.createFolder(atomicFolder);
             }
         },
-        copyHtmlFiles: function() {
+        html: function() {
 
             this.fs.copyTpl(
 
@@ -132,6 +132,54 @@ module.exports = generators.Base.extend({
 
 
         },
+        copyLibs: function() {
+
+            this.fs.copy(
+                this.templatePath('helper.js'),
+                this.destinationPath('libs/helper.js'), {
+                    contents: '<%= contents %>'
+                }
+            );
+
+            this.fs.copy(
+                this.templatePath('precomp-pattern.js'),
+                this.destinationPath('libs/precomp-pattern.js')
+            );
+
+            this.fs.copy(
+                this.templatePath('gen-config.js'),
+                this.destinationPath('libs/gen-config.js')
+            );
+
+            this.fs.copy(
+                this.templatePath('ssgCore.templates.js'),
+                this.destinationPath('libs/scripts/ssgCore.templates.js')
+            );
+
+            this.fs.copy(
+                this.templatePath('ssgCore.css'),
+                this.destinationPath('libs/styles/ssgCore.css')
+            );
+
+            this.fs.copy(
+                this.templatePath('pattern.conf.json'),
+                this.destinationPath('app/_config/pattern.conf.json')
+            );
+
+        },
+        copyPrism: function() {
+
+            this.fs.copy(
+                this.templatePath('prism.js'),
+                this.destinationPath('libs/scripts/prism.js')
+            );
+
+            this.fs.copy(
+                this.templatePath('prism.css'),
+                this.destinationPath('libs/styles/prism.css')
+            );
+
+        },
         copyCore: function() {
 
             this.fs.copyTpl(
@@ -140,10 +188,15 @@ module.exports = generators.Base.extend({
             );
 
             this.fs.copyTpl(
-                this.templatePath('gulpfile.txt'),
+                this.templatePath('gulpfile.js'),
                 this.destinationPath('gulpfile.js'), {
                     contents: '<%= contents %>'
                 }
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('bower.json'),
+                this.destinationPath('bower.json'), {}
             );
 
             this.fs.copyTpl(
