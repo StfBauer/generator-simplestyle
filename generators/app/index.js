@@ -67,10 +67,10 @@ module.exports = generators.Base.extend({
                     'app/styles/molecules',
                     'app/styles/templates',
                     'app/styles/pages',
-                    'app/_pattern/atoms',
-                    'app/_pattern/molecules',
-                    'app/_pattern/templates',
-                    'app/_pattern/pages'
+                    'app/_patterns/atoms',
+                    'app/_patterns/molecules',
+                    'app/_patterns/templates',
+                    'app/_patterns/pages'
                 ];
                 helper.createFolder(atomicFolder);
             }
@@ -182,9 +182,9 @@ module.exports = generators.Base.extend({
         },
         copyCore: function() {
 
-            this.fs.copyTpl(
-                this.templatePath('gulp.config'),
-                this.destinationPath('gulp.config.js'), {}
+            this.fs.copy(
+                this.templatePath('gulp.config.js'),
+                this.destinationPath('gulp.config.js')
             );
 
             this.fs.copyTpl(

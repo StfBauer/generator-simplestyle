@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     wiredep = require('wiredep').stream,
     browserSync = require('browser-sync'),
     args = require('yargs').argv,
+    chalk = require('chalk'),
 
     // custom plugins for simple style guide
     helper = require('./libs/helper'),
@@ -179,7 +180,7 @@ gulp.task('ssgCore-update', function() {
     return gulp.src('app/_core/**/*.js')
         .pipe($.sourcemaps.init())
         .pipe($.concat('ssgCoreLib.js'))
-        .pipe($.wrap('var jQuery = jQuery.noConflict();\n(function($){\n\'use strict\';\n<%= contents %>\n})(jQuery);'))
+        .pipe($.wrap('var jQuery = jQuery.noConflict();\n(function($){\n\'use strict\';\n&lt;%= contents %&gt;\n})(jQuery);'))
         .pipe($.sourcemaps.write('./', {
             includeContent: false,
             sourceRoot: '/_core/'
@@ -263,6 +264,26 @@ gulp.task('vet-dev', function() {
 // compile handlebar patterns
 gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core', 'precompile:ssg', 'vet'], function() {
 
+    gulp.watch('app/_patterns/**/*.hbs', function(event) {
+
+        ssgCoreConfig.fsEvents(event, config);
+
+    });
+
+    // Recompile pattern
+    gulp.watch([
+        'app/*.html',
+        'app/scripts/**/*.js',
+        'app/images/**/*',
+    ]).on('change', reload);
+
+    gulp.watch(['app/_config/*.json'], ['precompile:ssg'], reload);
+
+    // gulp.watch('app/_core/**/*.js', ['ssgCore-update'], reload);
+
+    // gulp.watch('app/_core/styles/*.scss', ['styles:core'], reload);
+    gulp.watch('app/styles/**/*.scss', ['styles'], reload);
+
     browserSync({
         notify: false,
         port: 9000,
@@ -276,24 +297,5 @@ gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core'
         },
         https: true
     });
-
-
-    // Update configuration
-    gulp.watch('app/_pattern/**/*.hbs')
-        // item was changed
-        .on('change', ssgCoreConfig.fsEvents);
-
-    // Recompile pattern
-    gulp.watch([
-        'app/*.html',
-        'app/scripts/**/*.js',
-        'app/images/**/*',
-        'app/_config/*.json',
-    ]).on('change', reload);
-
-    gulp.watch('app/_core/**/*.js', ['ssgCore-update'], reload);
-
-    gulp.watch('app/_core/styles/*.scss', ['styles:core'], reload);
-    gulp.watch('app/styles/**/*.scss', ['styles'], reload);
 
 });

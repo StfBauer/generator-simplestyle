@@ -18,7 +18,7 @@ module.exports = function(patternConfig) {
         handlebars: require('handlebars')
     };
 
-    var config = require(process.cwd() + 'gulp.config.js');
+    var config = require(process.cwd() + '/gulp.config.js');
 
     // partials stream
     var partials = gulp.src(patternConfig.partials)

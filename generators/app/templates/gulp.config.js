@@ -10,15 +10,15 @@ module.exports = (function() {
         basepath: basepath,
         patternConfig: basepath + '_config/pattern.conf.json',
         patterns: [
-            basepath + '_pattern/**/*.hbs'
+            basepath + '_patterns/**/*.hbs'
         ],
         ssg: {
             partials: [
-                basepath + '_pattern/**/*.hbs',
+                basepath + '_patterns/**/*.hbs',
                 basepath + '_core/**/_*.hbs'
             ],
             templates: [
-                basepath + '_pattern/**/[^_]*.hbs'
+                basepath + '_patterns/**/[^_]*.hbs'
             ],
             namespace: 'ssg.templates'
         },
@@ -31,7 +31,6 @@ module.exports = (function() {
             ],
             namespace: 'ssgCore.templates'
         },
-        docs: basepath + '_pattern.docs/',
         configs: basepath + '_config/',
         preCompTemplates: 'precomp.js',
         tempFiles: '.tmp/',

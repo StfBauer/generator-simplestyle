@@ -1,5 +1,8 @@
 {
-    "patterns": [],
+    "patterns": [
+
+
+    ],
     "folder": [{
         "name": "atoms",
         "description": "Contains all atom elements"

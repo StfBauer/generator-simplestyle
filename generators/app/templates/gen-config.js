@@ -7,202 +7,25 @@ var gulp = require('gulp'),
     chalk = require('chalk'),
     config = require('../gulp.config.js'),
     browserSync = require('browser-sync'),
-    precompile = require('./precomp-pattern.js');
+    precompile = require('./precomp-pattern.js'),
+    path = require('path');
 
 var reload = browserSync.reload;
 
 module.exports = {
 
-    createConfig: function(options) {
+    fsEvents: function(event, config) {
 
-        var patternsData = [];
-        var folder = [];
+        var patternConfigPath = process.cwd() + '/' + config.patternConfig,
+            patternConfig = require(patternConfigPath),
+            appPath = process.cwd() + '/app/_patterns/';
 
-        var statistics = 0;
-
-        var handleDuplicates = function(data) {
-
-            var found = patternsData.filter(function(obj) {
-
-                return obj.filepath === data.filepath;
-
-            });
-
-            var filepath = data.filepath.split('/')[0];
-
-            if (found.length === 0) {
-
-                patternsData.push(data);
-
-            }
-
-        };
-
-        var updateConfig = function(event) {
-            if (event.type === 'deleted') {
-                console.log(event.path);
-            }
-        };
-
-        var createItem = function(file, enc, callback) {
-
-            var path = require('path');
-
-            // init pattern configs
-            var filename = path.basename(file.relative),
-                extension = path.extname(file.relative),
-                basename = filename.replace(extension, ''),
-                patternpath = path.dirname(file.relative),
-                title = basename.indexOf('_') === 0 ? basename.substr(1) : basename;
-
-            // create pattern object
-            var data = {
-                title: title,
-                description: '',
-                filename: basename,
-                filepath: file.relative
-            };
-
-            this.push(data);
-
-            callback();
-
-        };
-
-        var writeConfigToFile = function() {
-
-            console.log('pattern sort');
-            patternsData = patternsData.sort(function(a, b) {
-                if (a.filepath < b.filepath)
-                    return -1;
-                else if (a.filepath > b.filepath)
-                    return 1;
-                else
-                    return 0;
-            });
-            console.log('pattern sort');
-
-            var patternConfig = {
-                patterns: patternsData,
-                folder: [{
-                    'name': 'atoms',
-                    'description': 'Contains all atom elements'
-                }, {
-                    'name': 'molecules',
-                    'description': 'Contains all molecule elements'
-                }, {
-                    'name': 'organism',
-                    'description': 'Contains all organism elements'
-                }, {
-                    'name': 'templates',
-                    'description': 'Contains all templates elements'
-                }, {
-                    'name': 'pages',
-                    'description': 'Contains all pages elements'
-                }]
-            };
-
-            var patterns = JSON.stringify(patternConfig, null, 4);
-
-            fs.writeFile(options.configFile, patterns, function(err) {
-
-                if (err) {
-                    return plugins.util.log(
-                        plugins.util.colors.red(err)
-                    );
-                }
-
-                plugins.util.log(
-                    plugins.util.colors.green('The file was saved!')
-                );
-
-                precompile(config.ssg);
-
-            });
-        };
-
-        var logData = function() {
-
-            console.log(statistics);
-            console.log(patternsData.length);
-            console.log(patternsData);
-            writeConfigToFile();
-        };
-
-        var loadConfig = (function() {
-
-            plugins.util.log('... Loading current configuration');
-
-            var curConfigPath = options.configFile;
-
-            var exists;
-
-            try {
-
-                exists = fs.statSync(curConfigPath);
-
-            } catch (erro) {
-
-                exists = null;
-                return;
-
-            }
-
-            try {
-
-                // Loading old configuration
-                var config = fs.readFileSync(options.configFile);
-
-                // parse json config
-                var configData = JSON.parse(config);
-
-                // check if configuration data exits
-                patternsData = configData !== undefined &&
-                    configData.patterns !== undefined ? configData.patterns : [];
-
-                plugins.util.log(
-                    'Found',
-                    patternsData.length,
-                    'pattern(s) in current configuration.');
-
-                statistics = patternsData.length;
-
-            } catch (err) {
-
-                plugins.util.log(plugins.util.colors.red(err));
-
-            }
-        }());
-
-        return gulp.src(options.patterns, {
-                read: false
-            })
-            .pipe(plugins.plumber())
-            .pipe(plugins.print())
-            .pipe(through2.obj(createItem))
-            .on('data', handleDuplicates)
-            .on('end', logData);
-    },
-
-    fsEvents: function(event) {
-
-        var updateCause = {
-            deleted: 'marked patterns for deletion',
-            renamed: 'pattern was renamed',
-            added: 'new pattern added',
-            cleanup: 'some legacy patterns was removed'
-        };
-
-        // include path for file handling
-        var path = require('path');
-
-        // load current configuration
-        var currentConfig = require('../app/_config/pattern.conf.json');
-
-
-        var getRelativePath = function(filePath) {
-            return path.relative(path.resolve(config.basepath + '_pattern/'), filePath);
-        };
+        // {
+        //     "title": "Figure Caption",
+        //     "description": "",
+        //     "filename": "01-figure-caption",
+        //     "filepath": "atoms/figures/01-figure-caption.hbs"
+        // },
 
         var patternPrecompile = function() {
 
@@ -230,36 +53,38 @@ module.exports = {
 
         };
 
-        // write configuration to file
-        var updateConfigFile = function(newConfig, cause) {
+        // mark file in config as deleted
+        var markDeleted = function(filename) {
 
-            if (cause === null || cause === undefined) {
-                cause = '';
-            }
+        };
 
-            var currentPatterns = newConfig.patterns;
+        // renames files in pattern config
+        var renamePatter = function(files) {
 
-            var sortedPatterns = currentPatterns.sort(function(a, b) {
+        };
 
-                if (a.filepath < b.filepath) {
-                    return -1;
-                }
-                if (a.filepath > b.filepath) {
-                    return 1;
-                }
+        var trimExtension = function(file) {
+            var extension = path.extname(file);
+            return file.replace(extension, '');
+        };
 
-                // names must be equal
-                return 0;
+        var selectPatternByPath = function(patterns, filepath) {
+            return patterns.filter(function(object) {
+                return object.filepath === filepath;
             });
+        }
 
-            newConfig.patterns = sortedPatterns;
-            // console.log('Hello world');
-            // console.log(test);
-            // console.log('Hello world');
+        var invertedPatternByPath = function(patterns, filepath) {
+            return patterns.filter(function(object) {
+                return object.filepath !== filepath;
+            });
+        }
 
-            var patterns = JSON.stringify(newConfig, null, 4);
+        var saveConfig = function(curConfig) {
 
-            fs.writeFile(config.patternConfig, patterns, function(err) {
+            var patterns = JSON.stringify(curConfig, null, 4);
+
+            fs.writeFile(patternConfigPath, patterns, function(err) {
 
                 if (err) {
                     return plugins.util.log(
@@ -267,219 +92,172 @@ module.exports = {
                     );
                 }
 
-                plugins.util.log('Configuration updated:',
-                    plugins.util.colors.green(cause)
+                plugins.util.log(
+                    plugins.util.colors.green('Configuration updated')
                 );
 
-                precompile(config.ssg);
-                plugins.util.log(
-                    plugins.util.colors.cyan('Pattern precompiled')
-                );
+                console.log('heureka');
+                patternPrecompile();
 
             });
-
         };
 
-        // Added Event
-        var added = function(pathToFile) {
+        // create pattern item
+        var createPatternItem = function(file) {
 
-            var file = getRelativePath(pathToFile);
+            var filename = path.basename(file),
+                filenameNoExt = trimExtension(filename),
+                relPath = path.relative(appPath, file);
 
-            // push pattern into config
-
-            var path = require('path');
-
-            // init pattern configs
-            var extension = path.extname(file),
-                patternpath = path.dirname(file),
-                basename = file.replace(extension, '').replace(patternpath + '/', ''),
-                title = basename.indexOf('_') === 0 ? basename.substr(1) : basename;
-
-            // create pattern object
-            var item = {
-                title: title,
+            var newPattern = {
+                title: filenameNoExt,
                 description: '',
-                filename: basename,
-                filepath: file
+                filename: filenameNoExt,
+                filepath: relPath
             };
 
-            // check if item exists
-            var itemExits = currentConfig.patterns.filter(function(obj) {
-                return obj.filepath === file;
-            });
+            var curConfig = patternConfig.patterns;
 
-            if (itemExits.length === 0) {
+            var patternExists = selectPatternByPath(curConfig, relPath);
 
-                currentConfig.patterns.push(item);
-                currentConfig.patterns = cleanup(currentConfig.patterns);
-
-                updateConfigFile(currentConfig, updateCause.added);
-
+            if (patternExists.length === 0) {
+                curConfig.push(newPattern);
+                curConfig.sort(function(a, b) {
+                    if (a.filepath < b.filepath) return -1;
+                    if (a.filepath > b.filepath) return 1;
+                    return 0;
+                });
+                patternConfig.patterns = curConfig;
             }
 
-        };
+            plugins.util.log(
+                plugins.util.colors.green('Pattern ') +
+                filename +
+                plugins.util.colors.green(' was added')
+            );
 
-        // Rename Event
-        var renamed = function(pathToFile, oldPathToFile) {
-
-            var curFile = getRelativePath(pathToFile);
-            var oldFile = getRelativePath(oldPathToFile);
-
-            var oldItem = currentConfig.patterns.filter(function(obj) {
-                return obj.filepath === oldFile;
-            });
-
-            var newPatterns = currentConfig.patterns.filter(function(obj) {
-                return obj.filepath !== oldFile;
-            });
-
-            console.log(oldPathToFile);
-
-            if (oldItem.length !== 0) {
-
-                // unmark delete property
-                delete(oldItem[0].delete);
-
-                // Update file path properties
-                var filename = path.basename(curFile),
-                    extension = path.extname(curFile),
-                    basename = filename.replace(extension, ''),
-                    patternpath = path.dirname(curFile);
-
-                // set new file path properties
-                oldItem[0].filename = basename;
-                oldItem[0].filepath = curFile;
-
-                newPatterns.push(oldItem[0]);
-
-                currentConfig.patterns = cleanup(newPatterns);
-
-                updateConfigFile(currentConfig, updateCause.renamed);
-
-            } else {
-                added(pathToFile);
-            }
+            saveConfig(patternConfig);
 
         };
 
-        // Delete Event
-        var deleted = function(pathToFile) {
+        var renamePatternItem = function(files) {
 
-            var file = getRelativePath(pathToFile);
+            var curConfig = patternConfig.patterns,
+                // Old file
+                oldFile = path.basename(files.old),
+                oldFilenameNoExt = trimExtension(oldFile),
+                oldRelPath = path.relative(appPath, files.old),
+                // renamed file
+                newFile = path.basename(files.path),
+                newFilenameNoExt = trimExtension(newFile),
+                newRelPath = path.relative(appPath, files.path);
 
-            // get affected pattern entry
-            var itemToDelete = currentConfig.patterns.filter(function(obj) {
-                return obj.filepath === file;
-            });
+            var renamedPattern = selectPatternByPath(curConfig, oldRelPath);
 
-            // get new patterns without affected pattern entry
-            var newPatterns = currentConfig.patterns.filter(function(obj) {
-                return obj.filepath !== file;
-            });
+            if (renamedPattern.length !== 0) {
 
-            if (itemToDelete.length !== 0) {
+                delete renamedPattern[0].deleted;
+                renamedPattern[0].filename = newFile;
+                renamedPattern[0].filepath = newRelPath;
 
-                // Mark item for deletion
-                itemToDelete[0].delete = true;
+                patternConfig.patterns = curConfig;
 
-                // Add remove marker to patterns
-                newPatterns.push(itemToDelete[0]);
-
-                // assign updated remove marker
-                currentConfig.patterns = newPatterns;
-
-                // writing changes to configuration
-                updateConfigFile(currentConfig, updateCause.deleted);
-
-            }
-        };
-
-        var cleanup = function(patterns) {
-
-            var cleanedPattern = patterns.filter(function(obj) {
-                return obj['delete'] === undefined;
-            });
-
-            return cleanedPattern;
-
-        };
-
-        var handleFSDelete = function(event) {
-
-            var filepath = path.relative(path.resolve(config.basepath + '_pattern/'), event.path);
-
-            var currentConfig = require('../../app/_config/pattern.conf.json');
-            var currentPatterns = currentConfig.patterns;
-
-            var newPatterns = currentPatterns.filter(function(obj) {
-                return obj.filepath !== filepath;
-            });
-
-            var affectedPattern = currentPatterns.filter(function(obj) {
-                return obj.filepath === filepath;
-            });
-
-            currentConfig.patterns = newPatterns;
-
-            var patterns = JSON.stringify(currentConfig, null, 4);
-
-            fs.writeFile(config.patternConfig, patterns, function(err) {
-
-                if (err) {
-                    return plugins.util.log(
-                        plugins.util.colors.red(err)
-                    );
-                }
-
-                plugins.util.log(affectedPattern[0].title,
-                    plugins.util.colors.green('pattern removed from config.')
+                plugins.util.log(
+                    plugins.util.colors.cyan('Pattern file ') +
+                    oldFile +
+                    plugins.util.colors.cyan(' was renamed to ') +
+                    newFile
                 );
 
-            });
+                saveConfig(patternConfig);
+
+            }
+
         };
 
-        if (event.type === 'added') {
+        var deletePatternItem = function(file) {
 
-            // add new file to configuration
-            added(event.path);
+            var filename = path.basename(file),
+                filenameNoExt = trimExtension(filename),
+                relPath = path.relative(appPath, file),
+                curConfig = patternConfig.patterns;
 
-        }
+            var deletedPattern = selectPatternByPath(curConfig, relPath);
 
-        if (event.type === 'renamed') {
+            if (deletedPattern.length !== 0) {
 
-            // renamed
-            renamed(event.path, event.old);
+                deletedPattern[0].deleted = true;
 
-        }
+                plugins.util.log(
+                    plugins.util.colors.yellow('Pattern ') +
+                    deletedPattern[0].title +
+                    plugins.util.colors.yellow(' was marked for deletetion')
+                );
 
-        if (event.type === 'deleted') {
+                saveConfig(patternConfig);
 
-            // delete
-            deleted(event.path);
+            }
 
-        }
+        };
 
-        // Cleanup old items
-        if (event.type === 'changed') {
+        /* 
+            Handle all file events
+        */
+        var added = function(file) {
+            createPatternItem(file);
+        };
 
-            var patternCount = currentConfig.patterns.length;
-            var newPattern = cleanup(currentConfig.patterns);
+        // pattern rename handler
+        var renamed = function(files) {
+            renamePatternItem(files);
+        };
 
-            console.log(chalk.cyan('Pattern count before:  ') + patternCount);
-            console.log(chalk.cyan('Pattern count after:   ') + newPattern.length);
+        // pattern delete handler
+        var deleted = function(file) {
+            deletePatternItem(file);
+        };
 
-            if (patternCount !== newPattern.length) {
+        // pattern change handler
+        var changed = function(file) {
 
-                currentConfig.patterns = newPattern;
+            var filename = path.basename(file),
+                filenameNoExt = trimExtension(filename),
+                relPath = path.relative(appPath, file),
+                changedItem = patternConfig.patterns.filter(function(object) {
+                    return object.filepath === relPath;
+                });
 
-                updateConfigFile(currentConfig, updateCause.deleted);
+            // Check if pattern exists otherwise add it as new pattern
+            if (changedItem.length === 1) {
 
-            } else {
+                plugins.util.log(
+                    plugins.util.colors.cyan('Pattern ') +
+                    changedItem[0].title +
+                    plugins.util.colors.cyan(' was changed')
+                );
 
                 patternPrecompile();
 
+                // reload();
+            } else {
+                added(file);
             }
 
+        };
+
+        switch (event.type) {
+            case 'added':
+                added(event.path);
+                break;
+            case 'changed':
+                changed(event.path);
+                break;
+            case 'deleted':
+                deleted(event.path);
+                break;
+            case 'renamed':
+                renamed(event);
+                break;
         }
 
     }
