@@ -54,6 +54,19 @@ module.exports = generators.Base.extend({
     // Write tempaltes to destination
     writing: {
 
+        core: function() {
+
+            this.fs.copyTpl(
+                this.templatePath('.bowerrc'),
+                this.destinationPath('.bowerrc'), {}
+            );
+
+            this.fs.copyTpl(
+                this.templatePath('.gitignore'),
+                this.destinationPath('.gitignore'), {}
+            );
+
+        },
         baseFolder: function() {
 
             // In your generator
@@ -139,6 +152,11 @@ module.exports = generators.Base.extend({
                 this.destinationPath('libs/helper.js'), {
                     contents: '<%= contents %>'
                 }
+            );
+
+            this.fs.copy(
+                this.templatePath('main.js'),
+                this.destinationPath('app/scripts/main.js')
             );
 
             this.fs.copy(
