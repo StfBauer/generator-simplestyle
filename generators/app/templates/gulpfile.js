@@ -261,28 +261,39 @@ gulp.task('vet-dev', function() {
 
 });
 
+gulp.task('wiredep', () => {
+    // Inject into CSS files
+    gulp.src('app/styles/*.scss')
+        .pipe(wiredep({
+            ignorePath: /^(\.\.\/)+/
+        }))
+        .pipe(gulp.dest('app/styles'));
+    // Inject into html files
+    gulp.src('app/*.html')
+        .pipe(wiredep({
+            ignorePath: /^(\.\.\/)*\.\./
+        }))
+        .pipe(gulp.dest('app'));
+});
+
+
 // compile handlebar patterns
 gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core', 'precompile:ssg', 'vet'], function() {
 
     gulp.watch('app/_patterns/**/*.hbs', function(event) {
-
         ssgCoreConfig.fsEvents(event, config);
-
     });
 
     // Recompile pattern
     gulp.watch([
         'app/*.html',
         'app/scripts/**/*.js',
-        'app/images/**/*',
+        'app/images/**/*'
     ]).on('change', reload);
 
     gulp.watch(['app/_config/*.json'], ['precompile:ssg'], reload);
 
-    // gulp.watch('app/_core/**/*.js', ['ssgCore-update'], reload);
-
-    // gulp.watch('app/_core/styles/*.scss', ['styles:core'], reload);
-    gulp.watch('app/styles/**/*.scss', ['styles'], reload);
+    gulp.watch('./app/styles/**/*.scss', ['styles'], reload);
 
     browserSync({
         notify: false,

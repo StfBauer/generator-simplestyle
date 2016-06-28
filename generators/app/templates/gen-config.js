@@ -20,13 +20,6 @@ module.exports = {
             patternConfig = require(patternConfigPath),
             appPath = process.cwd() + '/app/_patterns/';
 
-        // {
-        //     "title": "Figure Caption",
-        //     "description": "",
-        //     "filename": "01-figure-caption",
-        //     "filepath": "atoms/figures/01-figure-caption.hbs"
-        // },
-
         var patternPrecompile = function() {
 
             plugins.util.log(
@@ -96,7 +89,6 @@ module.exports = {
                     plugins.util.colors.green('Configuration updated')
                 );
 
-                console.log('heureka');
                 patternPrecompile();
 
             });

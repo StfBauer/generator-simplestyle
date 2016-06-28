@@ -307,7 +307,6 @@ ssgCore.components.addSelector = function(items, index) {
     $('#ssg-item-selector').html(itemSelectorHtml);
 
     var patterns = $('.ssg-item[data-cat=' + ssgCore.Session.filter.get() + ']');
-    console.log(patterns);
 
     if (patterns.length !== 0) {
 
@@ -364,8 +363,7 @@ ssgCore.initUi = (function() {
 
 }());
 
-
-/* globals ssgCore,baseComponents,$ */
+/* globals ssgCore,baseComponents,$,Prism */
 ssgCore.Events = {};
 
 ssgCore.Events.toggleToc = function(event) {
@@ -508,8 +506,6 @@ ssgCore.Events.enableDiscoMode = function(event) {
 // enables different sections
 ssgCore.Events.sectionEnabler = function(curButton, affectedElement, noCode) {
 
-    console.log(affectedElement);
-
     if (curButton.hasClass('active')) {
 
         curButton.removeClass('active');
@@ -565,15 +561,11 @@ ssgCore.Events.enableCode = function(event) {
     } else {
         // when templates or pages are currently selectd
         ssgCore.Events.sectionEnabler(curButton, affectedElement, true);
-        console.log($('#ssg-items').data('item-index'));
     }
 
     if (curButton.hasClass('active')) {
 
         ssgCore.Session.uiOptions.add('code');
-
-        console.log('need to enable the code here');
-        console.log('currently active');
 
     } else {
 
@@ -581,13 +573,9 @@ ssgCore.Events.enableCode = function(event) {
 
         $('.ssg-item-code').removeClass('show');
 
-        // remove all code elements
-        console.log('remove SHOW here');
-        console.log('currently de-active');
-
     }
 
-    console.log(sessionStorage);
+    Prism.highlightAll();
 
 };
 
@@ -623,8 +611,6 @@ ssgCore.Events.prevPage = function(event) {
 
     event.preventDefault();
 
-    console.log('Move Next');
-
     var curIndex = $('#ssg-items').data('item-index');
 
     $('#ssg-items').data('item-index', curIndex - 1);
@@ -644,8 +630,6 @@ ssgCore.Events.nextPage = function(event) {
     $('.ssg-item-code').removeClass('show');
 
     $('#ssg-items').data('item-index', curIndex + 1);
-
-    console.log('Move Next');
 
     ssgCore.components.addSelector(ssgCore.itemSelector, curIndex + 1);
 
@@ -688,7 +672,6 @@ ssgCore.Events.init = (function() {
 
 
 }());
-
 /* globals ssgCore,baseComponents,$ */
 ssgCore.Session = {};
 
@@ -774,11 +757,6 @@ ssgCore.UIHelper.setCategoryFilter = function(filter) {
     // setting correct button active
 
     ssgCore.Session.filter.add(filter);
-    console.log('Set filter:  ' + filter);
-
-    // regular filter behaviour
-    console.log(typeof filter);
-    console.log(filter);
 
     if (filter != null) {
 
@@ -821,16 +799,13 @@ ssgCore.UIHelper.setCategoryFilter = function(filter) {
 
     } else {
 
-        console.log('------___________-------');
         // show all elements
         $('.ssg-item').removeClass('hide');
-        console.log($('.ssg-item'));
         // hide templates and pages
         $('.ssg-item[data-cat=pages]').addClass('hide');
-        console.log($('.ssg-item'));
+
         $('.ssg-item[data-cat=templates]').addClass('hide');
-        console.log($('.ssg-item'));
-    
+
     }
 
 };
@@ -857,6 +832,5 @@ ssgCore.UIHelper.enablePaging = function(elements) {
     ssgCore.components.addSelector(items, 0);
 
 };
-
 })(jQuery);
 //# sourceMappingURL=ssgCoreLib.js.map
