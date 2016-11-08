@@ -39,7 +39,7 @@ var checkJSStyle = function(files) {
         });
 };
 
-// Used for inject 
+// Used for inject
 var inject = function(options) {
 
     // pages to inject files
@@ -299,7 +299,7 @@ gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core'
         notify: false,
         port: 9000,
         server: {
-            baseDir: ['libs', '.tmp', 'app'],
+            baseDir: ['app', 'libs', '.tmp'],
             routes: {
                 '/bower_components': 'bower_components',
                 '/tmp': '/',
