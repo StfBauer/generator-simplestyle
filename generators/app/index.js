@@ -69,6 +69,7 @@ module.exports = generators.Base.extend({
                 var atomicFolder = [
                     'app/_patterns/atoms',
                     'app/_patterns/molecules',
+                    'app/_patterns/organism',
                     'app/_patterns/templates',
                     'app/_patterns/pages'
                 ];
