@@ -9,7 +9,7 @@ var generators = require('yeoman-generator');
 
 module.exports = generators.Base.extend({
     // The name `constructor` is important here
-    constructor: function() {
+    constructor: function () {
         // Calling the super constructor is important so our generator is correctly set up
         generators.Base.apply(this, arguments);
 
@@ -19,32 +19,27 @@ module.exports = generators.Base.extend({
 
     },
     // Ask user for input
-    prompting: function() {
+    prompting: function () {
 
         return this.prompt([{
-                type: 'input',
-                name: 'name',
-                message: 'Your project name',
-                default: this.appname // Default to current folder name
-            },
-            // Create style folders
-            {
-                type: 'confirm',
-                name: 'atomic',
-                message: 'Should folders for atomic design be created?',
-                default: true
-            }, {
-                type: 'confirm',
-                name: 'https',
-                message: 'Should web server configure to use HTTPS?',
-                default: true
-            }, {
-                type: 'confirm',
-                name: 'sass',
-                message: 'Should SASS support be enabled?',
-                default: true
-            }
-        ]).then(function(answers) {
+            type: 'input',
+            name: 'name',
+            message: 'Your project name',
+            default: this.appname // Default to current folder name
+        },
+        // Create style folders
+        {
+            type: 'confirm',
+            name: 'atomic',
+            message: 'Should folders for atomic design be created?',
+            default: true
+        }, {
+            type: 'confirm',
+            name: 'https',
+            message: 'Should web server configure to use HTTPS?',
+            default: true
+        }
+        ]).then(function (answers) {
 
             this.options['ssgSettings'] = answers;
 
@@ -54,7 +49,7 @@ module.exports = generators.Base.extend({
     // Write tempaltes to destination
     writing: {
 
-        core: function() {
+        core: function () {
 
             this.fs.copyTpl(
                 this.templatePath('.bowerrc'),
@@ -67,7 +62,7 @@ module.exports = generators.Base.extend({
             );
 
         },
-        baseFolder: function() {
+        baseFolder: function () {
 
             // In your generator
             var baseFolder = ['app', 'app/styles'];
@@ -76,10 +71,7 @@ module.exports = generators.Base.extend({
 
             if (this.options.ssgSettings && this.options.ssgSettings.atomic) {
 
-                var atomicFolder = ['app/styles/atoms',
-                    'app/styles/molecules',
-                    'app/styles/templates',
-                    'app/styles/pages',
+                var atomicFolder = [
                     'app/_patterns/atoms',
                     'app/_patterns/molecules',
                     'app/_patterns/templates',
@@ -88,40 +80,29 @@ module.exports = generators.Base.extend({
                 helper.createFolder(atomicFolder);
             }
         },
-        html: function() {
+        html: function () {
 
             this.fs.copyTpl(
 
                 this.templatePath('index.html'),
-                this.destinationPath('app/index.html'), {
-                    title: 'Templating with Yeoman'
+                this.destinationPath('app/index.html'),
+                {
+                    appname: this.appname,
                 }
             );
 
         },
-        copyStyles: function() {
+        copyStyles: function () {
 
-            if (this.options.ssgSettings.sass) {
+            this.fs.copyTpl(
+                this.templatePath('main.css'),
+                this.destinationPath('app/styles/main.scss'), {
+                    bowerComponents: '// bower:scss\r\n// endbower'
+                }
+            );
 
-                this.fs.copyTpl(
-                    this.templatePath('main.css'),
-                    this.destinationPath('app/styles/main.scss'), {
-                        bowerComponents: '// bower:scss\r\n// endbower'
-                    }
-                );
-
-            } else {
-
-                this.fs.copyTpl(
-                    this.templatePath('main.css'),
-                    this.destinationPath('app/styles/main.css'), {
-                        bowerComponents: ''
-                    }
-                );
-
-            }
         },
-        copyLibraries: function() {
+        copyLibraries: function () {
 
             this.fs.copyTpl(
                 this.templatePath('ssgCore.templates.js'),
@@ -145,7 +126,7 @@ module.exports = generators.Base.extend({
 
 
         },
-        copyLibs: function() {
+        copyLibs: function () {
 
             this.fs.copy(
                 this.templatePath('helper.js'),
@@ -185,7 +166,7 @@ module.exports = generators.Base.extend({
             );
 
         },
-        copyPrism: function() {
+        copyPrism: function () {
 
             this.fs.copy(
                 this.templatePath('prism.js'),
@@ -198,7 +179,7 @@ module.exports = generators.Base.extend({
             );
 
         },
-        copyCore: function() {
+        copyCore: function () {
 
             this.fs.copy(
                 this.templatePath('gulp.config.js'),
@@ -225,7 +206,7 @@ module.exports = generators.Base.extend({
         }
 
     },
-    install: function() {
+    install: function () {
         this.installDependencies();
     }
 

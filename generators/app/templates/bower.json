@@ -22,7 +22,6 @@
     ],
     "private": true,
     "dependencies": {
-        "jquery": "~2.1.4",
         "modernizer": "~2.8.2",
         "handlebars": "~4.0.5",
         "prism": "^1.5.1"
