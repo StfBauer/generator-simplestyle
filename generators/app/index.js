@@ -75,6 +75,7 @@ module.exports = generators.Base.extend({
                 ];
                 helper.createFolder(atomicFolder);
             }
+
         },
         html: function () {
 
@@ -196,6 +197,35 @@ module.exports = generators.Base.extend({
             this.fs.copyTpl(
                 this.templatePath('package.json'),
                 this.destinationPath('package.json'), {}
+            );
+
+        },
+        copyFirstPatterns: function () {
+
+            // Style Guide Items - Atoms
+            this.fs.copy(
+                this.templatePath('./styleguideitems/01-your-first-atom.hbs'),
+                this.destinationPath('app/_patterns/atoms/01-your-first-atom.hbs')
+            );
+            // Style Guide Items - Molecules
+            this.fs.copy(
+                this.templatePath('./styleguideitems/01-your-first-molecule.hbs'),
+                this.destinationPath('app/_patterns/molecules/01-your-first-molecule.hbs')
+            );
+            // Style Guide Items - Organism
+            this.fs.copy(
+                this.templatePath('./styleguideitems/01-your-first-organism.hbs'),
+                this.destinationPath('app/_patterns/organism/01-your-first-organism.hbs')
+            );
+            // Style Guide Items - Template
+            this.fs.copy(
+                this.templatePath('./styleguideitems/01-your-first-template.hbs'),
+                this.destinationPath('app/_patterns/templates/01-your-first-template.hbs')
+            );
+            // Style Guide Items - Pages
+            this.fs.copy(
+                this.templatePath('./styleguideitems/01-your-first-page.hbs'),
+                this.destinationPath('app/_patterns/pages/01-your-first-page.hbs')
             );
 
         }
