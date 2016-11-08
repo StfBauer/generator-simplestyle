@@ -1,1 +1,843 @@
-var filterType;!function(a){a[a.category=0]="category",a[a.item=1]="item"}(filterType||(filterType={}));var SsgUI;!function(a){"use strict";var b=window.document;a.UiState={currentFilter:{filter:"atoms",type:filterType.category},uiOptions:{isolateUI:!1,showAnnotation:!1,showCode:!1}},a.UiElements={additionalTools:{buttons:[{action:"Isolate"},{action:"Code"},{action:"Annotation"}],container:"ssg-add-tools"},baseContainer:"ssg-patterns-inner",btnAnnot:"annotation",btnCode:"code",btnIsolate:"isolate",btnPrefix:"ssg-btn",code:".ssg-item-code",disco:"ssg-btn-disco",filter:"#ssg-filter",filterButtons:{buttons:[{action:"Atoms"},{action:"Molecules"},{action:"Organism"},{action:"Templates"},{action:"Pages"}],container:"ssg-filter"},filterToc:{action:"TOC"},itemSelector:"ssg-item-selector",patternAnnotation:".ssg-item-description",patternItem:".ssg-item",resizer:"#ssg-vp-resizer",showCode:".ssg-item-code",toc:"ssg-toc",tocItem:".ssg-toc-item",toolbar:"#ssg-toolbar",viewport:{height:"ssg-vp-h",width:"ssg-vp-w"}};var d;!function(a){function b(a,b){return new Promise(function(c,d){var e,f=function(){this.status>=200&&this.status<300?c(e.response):d({status:this.status,statusText:e.statusText})},g=function(){d({status:this.status,statusText:e.statusText})};e=new XMLHttpRequest,e.open(a,b),e.onload=f,e.onerror=g,e.send()})}a.requestData=b}(d=a.Utils||(a.Utils={}));var e;!function(b){function c(){var b;if(void 0===window.sessionStorage)throw"Session storage not available please update your browser";var c=sessionStorage.getItem("ssgUI");return b=null!=c?JSON.parse(c.toString()):a.UiState}function d(a){if(void 0===a)throw"Session object not define";if(void 0===window.sessionStorage)throw"Session storage not available please update your browser";if(null!=a){var b=JSON.stringify(a);sessionStorage.setItem("ssgUI",b)}}b.getCurrentState=c,b.saveCurrentState=d}(e=a.Session||(a.Session={}));var f;!function(c){function e(){for(var c="",e=0;e<d.filterButtons.buttons.length;e++){var f=d.filterButtons.buttons[e],g={action:f.action.toLowerCase(),title:f.action};try{c+=Handlebars.partials.buttons(g)}catch(a){console.log(a)}}var h=b.getElementById(d.filterButtons.container);h.insertAdjacentHTML("beforeend",c);for(var i=b.querySelectorAll(d.filter+" ."+d.btnPrefix),j=0;j<i.length;j++){var k=i[j];k.addEventListener("click",a.Events.filterSections)}}function f(){var c=b.querySelector(d.resizer);c.innerHTML=ssgCore.templates.vpresizer();var e=b.getElementById(a.UiElements.viewport.height),f=b.getElementById(a.UiElements.viewport.width);e.value=window.innerHeight.toString(),f.value=window.innerWidth.toString();var g=b.getElementById(d.disco);g.addEventListener("click",a.Events.enableDisco)}function g(){var c=b.getElementById(d.itemSelector),e={action:d.filterToc.action.toLowerCase(),title:d.filterToc.action},f=Handlebars.partials.buttons(e);c.insertAdjacentHTML("beforeend",f);var g=b.getElementById(a.UiElements.btnPrefix+e.action);void 0!==g&&null!==g&&g.addEventListener("click",a.Events.showToc)}function h(){for(var c=b.getElementById(d.additionalTools.container),e=0;e<d.additionalTools.buttons.length;e++){var f=d.additionalTools.buttons[e],g={action:f.action.toLowerCase(),title:f.action},h=Handlebars.partials.buttons(g);c.insertAdjacentHTML("beforeend",h);var i=b.getElementById(d.btnPrefix+g.action);i.addEventListener("click",a.Events.additionalTools)}}function i(a){for(var c="",e=b.getElementById(d.baseContainer),f=0;f<a.patterns.length;f++){var g=a.patterns[f];g.baseFilter=g.filepath.split("/")[0],g.sample=ssg.templates[g.filename]();var h=ssgCore.templates.patternItem(g);c+=h}e.insertAdjacentHTML("beforeend",c)}function j(c){for(var e=c.patterns,f=c.folder,g=b.getElementById(a.UiElements.toc),h=0;h<f.length;h++){var i="<ul><li id=ssg-"+f[h].name+" class=ssg-toc-header>"+f[h].name+"</li><ul id=ssg-"+f[h].name+"-items class=ssg-toc-items></ul></ul>";g.insertAdjacentHTML("beforeend",i)}for(var j=0;j<e.length;j++){var k=e[j].filepath.split("/")[0],l='<li class=ssg-toc-item data-filter="'+e[j].filename+'">'+e[j].title+"</li>",m=b.getElementById("ssg-"+k+"-items");null!==m&&m.insertAdjacentHTML("beforeend",l)}for(var n=b.querySelectorAll(d.tocItem),o=0;o<n.length;o++)n[o].addEventListener("click",a.Events.filterTocItem)}function k(){var c=a.Session.getCurrentState();if(console.log(c),console.log(c.currentFilter.type),c.currentFilter.type===filterType.category){var e=Array.prototype.slice.call(b.querySelectorAll(".ssg-item[data-cat='"+c.currentFilter.filter+"']"));a.Events.showCurrentSelection(e,c.uiOptions.showCode);var f=b.getElementById(d.btnPrefix+c.currentFilter.filter);if(f.classList.add("active"),"templates"===c.currentFilter.filter){var g=b.getElementById("ssg-btntemplates");g.click()}if("pages"===c.currentFilter.filter){var g=b.getElementById("ssg-btnpages");g.click()}if("organism"===c.currentFilter.filter){var g=b.getElementById("ssg-btnorganism");g.click()}}if(c.currentFilter.type===filterType.item){var e=Array.prototype.slice.call(b.querySelectorAll(".ssg-item[data-file='"+c.currentFilter.filter+"']"));a.Events.showCurrentSelection(e);var f=b.getElementById(d.btnPrefix+"-toc");f.classList.add("active");for(var h=b.querySelectorAll(d.tocItem+"[data-filter='"+c.currentFilter.filter+"']"),i=0;i<h.length;i++){var j=h[i];j.classList.add("selected"),j.classList.add("session")}}if(c.uiOptions.isolateUI)try{a.Events.isolatePatterns(!0),b.getElementById(d.btnPrefix+d.btnIsolate).classList.add("active")}catch(a){throw a}if(c.uiOptions.showCode)try{a.Events.showCode(!0),b.getElementById(d.btnPrefix+d.btnCode).classList.add("active")}catch(a){throw a}if(c.uiOptions.showAnnotation)try{a.Events.showAnnotation(!0),b.getElementById(d.btnPrefix+d.btnAnnot).classList.add("active")}catch(a){throw a}}function l(){e(),h(),f(),Promise.all([a.Utils.requestData("GET","/scripts/pattern.conf.json")]).then(function(a){try{var b=JSON.parse(a.toString());g(),j(b),i(b)}catch(a){console.log(a)}}).then(function(){k()}).catch(function(a){console.log(a)})}function m(c){var e=b.getElementById("ssg-items");a.Session.getCurrentState();if(void 0===e||null===e){var g=b.querySelectorAll("div[data-cat='"+c+"']");if(null!==g&&0!==g.length){var h=g[0],i=h.querySelectorAll(".ssg-item-title")[0].textContent,j={index:0,title:i},k=ssgCore.templates.itemselector(j),l=b.getElementById(d.itemSelector);l.insertAdjacentHTML("afterbegin",k);for(var m=b.querySelectorAll("#ssg-items .ssg-btn"),n=0;n<m.length;n++)m[n].addEventListener("click",a.Events.navigateItems)}}}var d=a.UiElements;c.addFilterButtons=e,c.addViewPort=f,c.addTocElements=g,c.addTools=h,c.renderPatterns=i,c.renderToc=j,c.applySessionState=k,c.renderUI=l,c.itemSelector=m}(f=a.Render||(a.Render={}));var g;!function(c){function e(a){for(var c=b.querySelectorAll(a),d=0;d<c.length;d++){var e=c[d];e.classList.remove("active")}}function f(a){return a.replace(d.btnPrefix,"")}function g(c){c.preventDefault();var d=c.srcElement,e=a.Session.getCurrentState(),f=e.currentFilter.filter,g=b.querySelectorAll("div[data-cat='"+f+"']"),h=b.getElementById("ssg-items");if(void 0!==h.dataset.itemIndex){var i=parseInt(h.dataset.itemIndex);d.classList.contains("prev")&&(i-1<0?i=g.length-1:i-=1),d.classList.contains("next")&&(i+1<g.length?i+=1:i=0);for(var j=0;j<g.length;j++){var k=g[j];if(j===i){k.classList.remove("hide");var l=k.querySelector(".ssg-item-title"),m=b.querySelector(".item-title"),n=k.querySelectorAll(".ssg-item-code"),o=n[0];m.textContent=l.textContent,e.uiOptions.showCode&&o.classList.add("show")}else{k.classList.add("hide");var n=k.querySelectorAll(".ssg-item-code"),o=n[0];o.classList.remove("show")}}h.dataset.itemIndex=i}}function h(c){for(var e=b.querySelectorAll(d.patternItem),f=0;f<e.length;f++)c===!0?e[f].classList.add("isolate"):e[f].classList.remove("isolate");var g=a.Session.getCurrentState();g.uiOptions.isolateUI=!0,g.uiOptions.showCode=!1,g.uiOptions.showAnnotation=!1,a.Session.saveCurrentState(g)}function i(c){for(var e=b.querySelectorAll(d.patternAnnotation),f=0;f<e.length;f++){var g=e[f];c===!0?g.classList.add("show"):g.classList.remove("show")}var h=a.Session.getCurrentState();h.uiOptions.isolateUI=!1,h.uiOptions.showAnnotation=!0,a.Session.saveCurrentState(h)}function j(c){for(var e=a.Session.getCurrentState(),g=(e.currentFilter.filter,b.querySelectorAll(d.code)),h=0;h<g.length;h++){var i=g[h],j=a.UiUtils.getClosest(i,".ssg-item"),k=j.getAttribute("data-cat");"organism"!==k&&"pages"!==k&&"templates"!==k&&(c?i.classList.add("show"):i.classList.remove("show"))}Prism.highlightAll(!0),e.uiOptions.isolateUI=!1,e.uiOptions.showCode=c,a.Session.saveCurrentState(e)}function k(a,c){for(var e=b.querySelectorAll(d.patternItem),f=void 0!==c&&c,g=0;g<e.length;g++){var h=e[g];h.classList.add("hide")}for(var i=0;i<a.length;i++){var h=a[i];if(h.classList.remove("hide"),f){var j=h.querySelector(".ssg-item-code");j.classList.add("show")}}}function l(c){var e=a.Session.getCurrentState();if(void 0!==c)c.preventDefault(),e.currentFilter.type!==filterType.item&&c.srcElement.classList.toggle("active");else{var f=b.getElementById(d.toc);void 0!==f&&e.currentFilter.type!==filterType.item&&f.classList.toggle("active")}var g=b.getElementById(d.toc);g.classList.contains("show")?g.classList.remove("show"):g.classList.add("show")}function m(){for(var a=b.querySelectorAll(d.tocItem),c=0;c<a.length;c++)a[c].classList.remove("selected")}function n(c){if(void 0===c)throw"toc element cannot be filtered";var f=c.srcElement;f.classList.add("selected");var g=f.dataset.filter;if(void 0!==g){var h=Array.prototype.slice.call(b.querySelectorAll("div[data-file='"+g+"']"));k(h),b.getElementById(d.toc).classList.remove("show"),m()}e(d.filter+" ."+d.btnPrefix);var i=a.Session.getCurrentState();i.currentFilter.type=filterType.item,i.currentFilter.filter=g,a.Session.saveCurrentState(i)}function o(){var a=[],c=Array.prototype.slice.call(b.querySelectorAll("div[data-cat=templates] .ssg-item-code")),d=Array.prototype.slice.call(b.querySelectorAll("div[data-cat=pages] .ssg-item-code")),e=Array.prototype.slice.call(b.querySelectorAll("div[data-cat=organism] .ssg-item-code"));Array.prototype.push.apply(a,c),Array.prototype.push.apply(a,d),Array.prototype.push.apply(a,e);for(var f=0;f<a.length;f++){var g=a[f];g.classList.remove("show")}}function p(c){var g=a.Session.getCurrentState();if(void 0===c)throw"Filter cannot be selected";c.preventDefault();var h=c.srcElement;e(d.filter+" ."+d.btnPrefix),h.classList.add("active");var i=f(h.id).toLocaleLowerCase(),j=Array.prototype.slice.call(b.querySelectorAll("div[data-cat='"+i+"']"));b.querySelector("#"+d.itemSelector+" ."+d.btnPrefix);if(o(),"organism"===i||"templates"===i||"pages"===i)k(j.slice(0,1),g.uiOptions.showCode),a.Render.itemSelector(i);else{k(j);var m=b.querySelector(".ssg-cmd-section #ssg-items");m&&m.remove()}g.currentFilter.type=filterType.category,g.currentFilter.filter=i,a.Session.saveCurrentState(g)}function q(a){if(void 0===a)throw"Event not fired";a.preventDefault();var c=a.srcElement,g=d.btnPrefix+d.btnIsolate,k=b.getElementById(g).classList.contains("active"),l=f(c.id).toLowerCase(),m=!0;switch(c.classList.contains("active")&&(m=!1),l){case"isolate":i(!1),j(!1),e("#"+d.additionalTools.container+" ."+d.btnPrefix),c.classList.toggle("active"),h(m);break;case"code":k===!0&&(e("#"+d.additionalTools.container+" ."+d.btnPrefix),h(!1)),c.classList.toggle("active"),h(!1),j(m);break;case"annotation":k===!0&&(e("#"+d.additionalTools.container+" ."+d.btnPrefix),h(!1)),c.classList.toggle("active"),i(m)}}function r(c){c.preventDefault();var d=c.srcElement,e="ssg-patterns",f=b.getElementById(e),g=window.innerWidth;d.classList.contains("active")?(d.classList.remove("active"),a.UiUtils.discoMode()):(d.classList.add("active"),f.style.width=g.toString(),a.UiUtils.discoMode())}var d=a.UiElements;c.navigateItems=g,c.isolatePatterns=h,c.showAnnotation=i,c.showCode=j,c.showCurrentSelection=k,c.showToc=l,c.filterTocItem=n,c.resetCode=o,c.filterSections=p,c.additionalTools=q,c.enableDisco=r}(g=a.Events||(a.Events={}));var h;!function(c){function d(){var c,d=window.innerWidth,e=b.getElementById(a.UiElements.viewport.width),f="ssg-patterns",g=b.getElementById(f),h="ssg-patterns-inner",i=b.getElementById(h),j=b.getElementById("ssg-btn-disco");if(void 0!==g&&g.classList.contains("animate")===!1&&g.classList.add("animate"),void 0!==i&&i.classList.contains("animate")===!1&&i.classList.add("animate"),void 0!==j&&j.classList.contains("active")){do c=Math.floor(Math.random()*d+1);while(c<320);void 0!==g&&(void 0!==e&&(e.value=c.toString()),g.style.width=c.toString(),g.style.minWidth="0px"),window.setTimeout(function(){a.UiUtils.discoMode()},1e3)}else g.style.width="100%",setTimeout(function(){g.removeAttribute("style"),i.removeAttribute("style")},1e3)}function e(a,c){var f,g,d=c.charAt(0),e="classList"in b.documentElement;for("["===d&&(c=c.substr(1,c.length-2),f=c.split("="),f.length>1&&(g=!0,f[1]=f[1].replace(/"/g,"").replace(/'/g,"")));a&&a!==b&&1===a.nodeType;a=a.parentNode){if("."===d)if(e){if(a.classList.contains(c.substr(1)))return a}else if(new RegExp("(^|\\s)"+c.substr(1)+"(\\s|$)").test(a.className))return a;if("#"===d&&a.id===c.substr(1))return a;if("["===d&&a.hasAttribute(f[0])){if(!g)return a;if(a.getAttribute(f[0])===f[1])return a}if(a.tagName.toLowerCase()===c)return a}return null}c.discoMode=d,c.getClosest=e}(h=a.UiUtils||(a.UiUtils={}))}(SsgUI||(SsgUI={})),SsgUI.Render.renderUI();
+/// <reference path="../../typings/index.d.ts" />
+var filterType;
+(function (filterType) {
+    filterType[filterType["category"] = 0] = "category";
+    filterType[filterType["item"] = 1] = "item";
+})(filterType || (filterType = {}));
+var SsgUI;
+(function (SsgUI) {
+    'use strict';
+    var document = window.document;
+    var curPatternConfig = null;
+    SsgUI.UiState = {
+        currentFilter: {
+            filter: 'atoms',
+            type: filterType.category
+        },
+        uiOptions: {
+            isolateUI: false,
+            showAnnotation: false,
+            showCode: false
+        }
+    };
+    SsgUI.UiElements = {
+        additionalTools: {
+            buttons: [{
+                    action: 'Isolate'
+                }, {
+                    action: 'Code'
+                }, {
+                    action: 'Annotation'
+                }],
+            container: 'ssg-add-tools'
+        },
+        baseContainer: 'ssg-patterns-inner',
+        btnAnnot: 'annotation',
+        btnCode: 'code',
+        btnIsolate: 'isolate',
+        btnPrefix: 'ssg-btn',
+        code: '.ssg-item-code',
+        disco: 'ssg-btn-disco',
+        filter: '#ssg-filter',
+        filterButtons: {
+            buttons: [{
+                    action: 'Atoms'
+                }, {
+                    action: 'Molecules'
+                }, {
+                    action: 'Organism'
+                }, {
+                    action: 'Templates'
+                }, {
+                    action: 'Pages'
+                }],
+            container: 'ssg-filter'
+        },
+        filterToc: {
+            action: 'TOC'
+        },
+        itemSelector: 'ssg-item-selector',
+        patternAnnotation: '.ssg-item-description',
+        patternItem: '.ssg-item',
+        resizer: '#ssg-vp-resizer',
+        showCode: '.ssg-item-code',
+        toc: 'ssg-toc',
+        tocItem: '.ssg-toc-item',
+        toolbar: '#ssg-toolbar',
+        viewport: {
+            height: 'ssg-vp-h',
+            width: 'ssg-vp-w'
+        }
+    };
+    var Utils;
+    (function (Utils) {
+        function requestData(method, url) {
+            return new Promise(function (resolve, reject) {
+                var xhr;
+                var loaded = function () {
+                    if (this.status >= 200 && this.status < 300) {
+                        resolve(xhr.response);
+                    }
+                    else {
+                        reject({
+                            status: this.status,
+                            statusText: xhr.statusText
+                        });
+                    }
+                };
+                var onError = function () {
+                    reject({
+                        status: this.status,
+                        statusText: xhr.statusText
+                    });
+                };
+                xhr = new XMLHttpRequest();
+                xhr.open(method, url);
+                xhr.onload = loaded;
+                xhr.onerror = onError;
+                xhr.send();
+            });
+        }
+        Utils.requestData = requestData;
+        ;
+    })(Utils = SsgUI.Utils || (SsgUI.Utils = {}));
+    ;
+    var Session;
+    (function (Session) {
+        function getCurrentState() {
+            var state;
+            if (window.sessionStorage === undefined) {
+                throw 'Session storage not available please update your browser';
+            }
+            // try to get session storeage
+            var currentStateData = sessionStorage.getItem('ssgUI');
+            // if failes init with new one
+            if (currentStateData != null) {
+                // loading from Session
+                state = JSON.parse(currentStateData.toString());
+            }
+            else {
+                // loading from default
+                state = SsgUI.UiState;
+            }
+            return state;
+        }
+        Session.getCurrentState = getCurrentState;
+        function saveCurrentState(state) {
+            if (state === undefined) {
+                throw 'Session object not define';
+            }
+            if (window.sessionStorage === undefined) {
+                throw 'Session storage not available please update your browser';
+            }
+            // if failes init with new one
+            if (state != null) {
+                // loading from Session
+                var stateString = JSON.stringify(state);
+                sessionStorage.setItem('ssgUI', stateString);
+            }
+        }
+        Session.saveCurrentState = saveCurrentState;
+    })(Session = SsgUI.Session || (SsgUI.Session = {}));
+    var Render;
+    (function (Render) {
+        var core = SsgUI.UiElements; // core UI elements
+        function addFilterButtons() {
+            var allButtons = '';
+            for (var index = 0; index < core.filterButtons.buttons.length; index++) {
+                var curButton = core.filterButtons.buttons[index];
+                var curElement = {
+                    action: curButton.action.toLowerCase(),
+                    title: curButton.action
+                };
+                try {
+                    allButtons += Handlebars['partials'].buttons(curElement);
+                }
+                catch (exception) {
+                    console.log(exception);
+                }
+            }
+            // query filter
+            var filter = document.getElementById(core.filterButtons.container);
+            filter.insertAdjacentHTML('beforeend', allButtons);
+            var filterButtons = document.querySelectorAll(core.filter + ' .' + core.btnPrefix);
+            for (var j = 0; j < filterButtons.length; j++) {
+                var filterButton = filterButtons[j];
+                filterButton.addEventListener('click', SsgUI.Events.filterSections);
+            }
+        }
+        Render.addFilterButtons = addFilterButtons;
+        ;
+        /// viewport resizer
+        function addViewPort() {
+            var element = document.querySelector(core.resizer);
+            element.innerHTML = ssgCore.templates.vpresizer();
+            var height = document.getElementById(SsgUI.UiElements.viewport.height);
+            var width = document.getElementById(SsgUI.UiElements.viewport.width);
+            height.value = window.innerHeight.toString();
+            width.value = window.innerWidth.toString();
+            var discoBtn = document.getElementById(core.disco);
+            discoBtn.addEventListener('click', SsgUI.Events.enableDisco);
+        }
+        Render.addViewPort = addViewPort;
+        ;
+        function addTocElements() {
+            var element = document.getElementById(core.itemSelector), curButton = {
+                action: core.filterToc.action.toLowerCase(),
+                title: core.filterToc.action
+            }, tocButton = Handlebars['partials'].buttons(curButton);
+            element.insertAdjacentHTML('beforeend', tocButton);
+            var curBtn = document.getElementById(SsgUI.UiElements.btnPrefix + curButton.action);
+            if (curBtn !== undefined && curBtn !== null) {
+                curBtn.addEventListener('click', SsgUI.Events.showToc);
+            }
+        }
+        Render.addTocElements = addTocElements;
+        ;
+        /// add additionalTools
+        function addTools() {
+            var element = document.getElementById(core.additionalTools.container);
+            for (var i = 0; i < core.additionalTools.buttons.length; i++) {
+                var curButton = core.additionalTools.buttons[i];
+                var curElement = {
+                    action: curButton.action.toLowerCase(),
+                    title: curButton.action
+                };
+                var newButton = Handlebars['partials'].buttons(curElement);
+                element.insertAdjacentHTML('beforeend', newButton);
+                var btnCode = document.getElementById(core.btnPrefix + curElement.action);
+                btnCode.addEventListener('click', SsgUI.Events.additionalTools);
+            }
+        }
+        Render.addTools = addTools;
+        ;
+        function renderPatterns(config) {
+            var allPatternContent = '';
+            // fetch base container
+            var baseContainer = document.getElementById(core.baseContainer);
+            for (var index = 0; index < config.patterns.length; index++) {
+                // fetch current element
+                var patternElement = config.patterns[index];
+                // generate base filter value
+                // assign base filter
+                patternElement.baseFilter = patternElement.filepath.split('/')[0];
+                // assign pattern content
+                patternElement.sample = ssg.templates[patternElement.filename]();
+                // generatore content
+                var patternContent = ssgCore.templates.patternItem(patternElement);
+                allPatternContent += patternContent;
+            }
+            // append elements to content
+            baseContainer.insertAdjacentHTML('beforeend', allPatternContent);
+        }
+        Render.renderPatterns = renderPatterns;
+        ;
+        function renderToc(config) {
+            var patterns = config.patterns, folder = config.folder, ssgToc = document.getElementById(SsgUI.UiElements.toc);
+            for (var i = 0; i < folder.length; i++) {
+                var baseElement = '<ul><li id=ssg-' + folder[i].name + ' class=ssg-toc-header>' +
+                    folder[i].name +
+                    '</li><ul id=ssg-' + folder[i].name + '-items class=ssg-toc-items></ul></ul>';
+                ssgToc.insertAdjacentHTML('beforeend', baseElement);
+            }
+            for (var j = 0; j < patterns.length; j++) {
+                var folderpath = patterns[j].filepath.split('/')[0];
+                var patternTitle = '<li class=ssg-toc-item data-filter=\"' +
+                    patterns[j].filename + '\">' +
+                    patterns[j].title + '</li>';
+                var currentSection = document.getElementById('ssg-' + folderpath + '-items');
+                if (currentSection !== null) {
+                    currentSection.insertAdjacentHTML('beforeend', patternTitle);
+                }
+            }
+            var tocItems = document.querySelectorAll(core.tocItem);
+            for (var k = 0; k < tocItems.length; k++) {
+                tocItems[k].addEventListener('click', SsgUI.Events.filterTocItem);
+            }
+        }
+        Render.renderToc = renderToc;
+        ;
+        function applySessionState() {
+            var session = SsgUI.Session.getCurrentState();
+            console.log(session);
+            console.log(session.currentFilter.type);
+            if (session.currentFilter.type === filterType.category) {
+                var currentElement = Array.prototype.slice.call(document.querySelectorAll('.ssg-item[data-cat=\'' + session.currentFilter.filter + '\']'));
+                SsgUI.Events.showCurrentSelection(currentElement, session.uiOptions.showCode);
+                var currentButton = document.getElementById(core.btnPrefix + session.currentFilter.filter);
+                currentButton.classList.add('active');
+                if (session.currentFilter.filter === 'templates') {
+                    var curFilterButton = document.getElementById('ssg-btntemplates');
+                    curFilterButton.click();
+                }
+                if (session.currentFilter.filter === 'pages') {
+                    var curFilterButton = document.getElementById('ssg-btnpages');
+                    curFilterButton.click();
+                }
+                if (session.currentFilter.filter === 'organism') {
+                    var curFilterButton = document.getElementById('ssg-btnorganism');
+                    curFilterButton.click();
+                }
+            }
+            if (session.currentFilter.type === filterType.item) {
+                var currentElement = Array.prototype.slice.call(document.querySelectorAll('.ssg-item[data-file=\'' + session.currentFilter.filter + '\']'));
+                SsgUI.Events.showCurrentSelection(currentElement);
+                var currentButton = document.getElementById(core.btnPrefix + '-toc');
+                currentButton.classList.add('active');
+                var tocItems = document.querySelectorAll(core.tocItem +
+                    '[data-filter=\'' + session.currentFilter.filter + '\']');
+                for (var index = 0; index < tocItems.length; index++) {
+                    var tocItem = tocItems[index];
+                    tocItem.classList.add('selected');
+                    tocItem.classList.add('session');
+                }
+            }
+            // if add tools are set to isolate
+            if (session.uiOptions.isolateUI) {
+                try {
+                    SsgUI.Events.isolatePatterns(true);
+                    document.getElementById(core.btnPrefix + core.btnIsolate).classList.add('active');
+                }
+                catch (error) {
+                    throw error;
+                }
+            }
+            // if code preview is enabled
+            if (session.uiOptions.showCode) {
+                try {
+                    SsgUI.Events.showCode(true);
+                    document.getElementById(core.btnPrefix + core.btnCode).classList.add('active');
+                }
+                catch (error) {
+                    throw error;
+                }
+            }
+            // if annotations are enabled
+            if (session.uiOptions.showAnnotation) {
+                try {
+                    SsgUI.Events.showAnnotation(true);
+                    document.getElementById(core.btnPrefix + core.btnAnnot).classList.add('active');
+                }
+                catch (error) {
+                    throw error;
+                }
+            }
+        }
+        Render.applySessionState = applySessionState;
+        function renderUI() {
+            // load admin ui
+            addFilterButtons();
+            addTools();
+            addViewPort();
+            Promise.all([SsgUI.Utils.requestData('GET', '/_config/pattern.conf.json')])
+                .then(function (result) {
+                try {
+                    var patternConfig = JSON.parse(result.toString());
+                    addTocElements();
+                    renderToc(patternConfig);
+                    renderPatterns(patternConfig);
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            })
+                .then(function () {
+                applySessionState();
+            })
+                .catch(function (error) {
+                console.log(error);
+            });
+        }
+        Render.renderUI = renderUI;
+        ;
+        // check if only a singel item is selected
+        function itemSelector(filter) {
+            // check if slider element already exists on Page
+            var curItemSelector = document.getElementById('ssg-items'),
+            // get current state to compare with new filter string
+            session = SsgUI.Session.getCurrentState();
+            // return if exists
+            if (curItemSelector !== undefined && curItemSelector !== null) {
+                return;
+            }
+            // select affectedItems
+            var affectedItems = document.querySelectorAll('div[data-cat=\'' + filter + '\']');
+            if (affectedItems === null || affectedItems.length === 0) {
+                return;
+            }
+            // select first element of affectedItems in slider
+            var firstItem = affectedItems[0];
+            var title = firstItem.querySelectorAll('.ssg-item-title')[0].textContent;
+            var curItem = {
+                index: 0,
+                title: title
+            };
+            // select first element
+            var itemSelectorHtml = ssgCore.templates.itemselector(curItem);
+            // insert slider element
+            var itemSelector = document.getElementById(core.itemSelector);
+            itemSelector.insertAdjacentHTML('afterbegin', itemSelectorHtml);
+            var sliderButtons = document.querySelectorAll('#ssg-items .ssg-btn');
+            for (var index = 0; index < sliderButtons.length; index++) {
+                sliderButtons[index].addEventListener('click', SsgUI.Events.navigateItems);
+            }
+        }
+        Render.itemSelector = itemSelector;
+    })(Render = SsgUI.Render || (SsgUI.Render = {}));
+    ;
+    var Events;
+    (function (Events) {
+        var core = SsgUI.UiElements;
+        // resets buttons of current section call before setting active one;
+        function resetFilterButtons(btnElements) {
+            var filterButtons = document.querySelectorAll(btnElements);
+            for (var index = 0; index < filterButtons.length; index++) {
+                var filterButton = filterButtons[index];
+                filterButton.classList.remove('active');
+            }
+        }
+        ;
+        // returns current action string for futher selection
+        function getCurrentAction(actionString) {
+            return actionString.replace(core.btnPrefix, '');
+        }
+        ;
+        // navigation between organism, pages and template
+        function navigateItems(event) {
+            event.preventDefault();
+            // current event button
+            var curButton = event.srcElement,
+            // retrieve current session state
+            session = SsgUI.Session.getCurrentState(),
+            // current filter from session
+            filter = session.currentFilter.filter,
+            // current affected items
+            items = document.querySelectorAll('div[data-cat=\'' + filter + '\']'),
+            // navigation element
+            naviElement = document.getElementById('ssg-items');
+            if (naviElement.dataset['itemIndex'] === undefined) {
+                return;
+            }
+            // parse current item index
+            var curIndex = parseInt(naviElement.dataset['itemIndex']);
+            // navigate to previous element
+            if (curButton.classList.contains('prev')) {
+                if (curIndex - 1 < 0) {
+                    curIndex = items.length - 1;
+                }
+                else {
+                    curIndex -= 1;
+                }
+            }
+            // navigate to next element
+            if (curButton.classList.contains('next')) {
+                if (curIndex + 1 < items.length) {
+                    curIndex += 1;
+                }
+                else {
+                    curIndex = 0;
+                }
+            }
+            for (var index = 0; index < items.length; index++) {
+                var element = items[index];
+                if (index === curIndex) {
+                    element.classList.remove('hide');
+                    // query current item title
+                    var elemTitle = element.querySelector('.ssg-item-title'),
+                    // query current slider title
+                    elemSliderTitle = document.querySelector('.item-title'),
+                    // query code section of current item
+                    codeElements = element.querySelectorAll('.ssg-item-code'), codeElement = codeElements[0];
+                    // assign slider item to current title
+                    elemSliderTitle.textContent = elemTitle.textContent;
+                    // if code is selected - show code
+                    if (session.uiOptions.showCode) {
+                        codeElement.classList.add('show');
+                    }
+                }
+                else {
+                    element.classList.add('hide');
+                    var codeElements = element.querySelectorAll('.ssg-item-code'), codeElement = codeElements[0];
+                    codeElement.classList.remove('show');
+                }
+            }
+            naviElement.dataset.itemIndex = curIndex;
+        }
+        Events.navigateItems = navigateItems;
+        ;
+        // add isolation class to all pattern
+        function isolatePatterns(enable) {
+            var allElements = document.querySelectorAll(core.patternItem);
+            for (var index = 0; index < allElements.length; index++) {
+                if (enable === true) {
+                    allElements[index]
+                        .classList.add('isolate');
+                }
+                else {
+                    allElements[index]
+                        .classList.remove('isolate');
+                }
+            }
+            // get current state
+            var session = SsgUI.Session.getCurrentState();
+            // enable UI Isolation
+            session.uiOptions.isolateUI = true;
+            session.uiOptions.showCode = false;
+            session.uiOptions.showAnnotation = false;
+            // save current session
+            SsgUI.Session.saveCurrentState(session);
+        }
+        Events.isolatePatterns = isolatePatterns;
+        ;
+        // shows annotations of patterns
+        function showAnnotation(enable) {
+            // fetch all pattern annotattions
+            var allElements = document.querySelectorAll(core.patternAnnotation);
+            for (var index = 0; index < allElements.length; index++) {
+                var element = allElements[index];
+                if (enable === true) {
+                    element.classList.add('show');
+                }
+                else {
+                    element.classList.remove('show');
+                }
+            }
+            // get current state
+            var session = SsgUI.Session.getCurrentState();
+            // enable UI Isolateion
+            session.uiOptions.isolateUI = false;
+            session.uiOptions.showAnnotation = true;
+            // save current session
+            SsgUI.Session.saveCurrentState(session);
+        }
+        Events.showAnnotation = showAnnotation;
+        ;
+        function showCode(enable) {
+            // get current state
+            var session = SsgUI.Session.getCurrentState();
+            var curFilter = session.currentFilter.filter;
+            var allElements = document.querySelectorAll(core.code);
+            for (var index = 0; index < allElements.length; index++) {
+                // get current code element
+                var element = allElements[index];
+                var closest = SsgUI.UiUtils.getClosest(element, '.ssg-item');
+                var itemCat = closest.getAttribute('data-cat');
+                if (itemCat !== 'organism' &&
+                    itemCat !== 'pages' &&
+                    itemCat !== 'templates') {
+                    if (enable) {
+                        element.classList.add('show');
+                    }
+                    else {
+                        element.classList.remove('show');
+                    }
+                }
+            }
+            Prism.highlightAll(true);
+            // enable UI Isolateion
+            session.uiOptions.isolateUI = false;
+            session.uiOptions.showCode = enable;
+            // save current session
+            SsgUI.Session.saveCurrentState(session);
+        }
+        Events.showCode = showCode;
+        ;
+        function showCurrentSelection(selectedItems, showCode) {
+            var allElements = document.querySelectorAll(core.patternItem);
+            var code = showCode === undefined ? false : showCode;
+            // hide all elemtns
+            for (var i = 0; i < allElements.length; i++) {
+                var element = allElements[i];
+                element.classList.add('hide');
+            }
+            // show only current selection
+            for (var j = 0; j < selectedItems.length; j++) {
+                var element = selectedItems[j];
+                element.classList.remove('hide');
+                if (code) {
+                    var codeBlock = element.querySelector('.ssg-item-code');
+                    codeBlock.classList.add('show');
+                }
+            }
+        }
+        Events.showCurrentSelection = showCurrentSelection;
+        ;
+        function showToc(event) {
+            var session = SsgUI.Session.getCurrentState();
+            if (event !== undefined) {
+                event.preventDefault();
+                if (session.currentFilter.type !== filterType.item) {
+                    event.srcElement.classList.toggle('active');
+                }
+            }
+            else {
+                var tocBtn = document.getElementById(core.toc);
+                if (tocBtn !== undefined) {
+                    if (session.currentFilter.type !== filterType.item) {
+                        tocBtn.classList.toggle('active');
+                    }
+                }
+            }
+            var tocContainer = document.getElementById(core.toc);
+            if (tocContainer.classList.contains('show')) {
+                tocContainer.classList.remove('show');
+            }
+            else {
+                tocContainer.classList.add('show');
+            }
+        }
+        Events.showToc = showToc;
+        ;
+        function resetTocSelection() {
+            var tocElements = document.querySelectorAll(core.tocItem);
+            for (var index = 0; index < tocElements.length; index++) {
+                tocElements[index].classList.remove('selected');
+            }
+        }
+        //
+        function filterTocItem(event) {
+            if (event === undefined) {
+                throw 'toc element cannot be filtered';
+            }
+            var curElement = event.srcElement;
+            curElement.classList.add('selected');
+            var filter = curElement.dataset['filter'];
+            if (filter !== undefined) {
+                var affectedItems = Array.prototype.slice.call(document.querySelectorAll('div[data-file=\'' + filter + '\']'));
+                showCurrentSelection(affectedItems);
+                document.getElementById(core.toc).classList.remove('show');
+                // reset currently selected elements
+                resetTocSelection();
+            }
+            // rest all other filters
+            resetFilterButtons(core.filter + ' .' + core.btnPrefix);
+            // get current state
+            var session = SsgUI.Session.getCurrentState();
+            // enable UI Isolateion
+            session.currentFilter.type = filterType.item;
+            session.currentFilter.filter = filter;
+            // save current session
+            SsgUI.Session.saveCurrentState(session);
+        }
+        Events.filterTocItem = filterTocItem;
+        function resetCode() {
+            var allCodeElements = [];
+            // let allCode: Array<HTMLElement> = document.querySelectorAll('div[data-cat=templates] .ssg-item-code');
+            var allCodeTemplates = Array.prototype.slice.call(document.querySelectorAll('div[data-cat=templates] .ssg-item-code'));
+            var allCodePages = Array.prototype.slice.call(document.querySelectorAll('div[data-cat=pages] .ssg-item-code'));
+            var allCodeOrgansim = Array.prototype.slice.call(document.querySelectorAll('div[data-cat=organism] .ssg-item-code'));
+            Array.prototype.push.apply(allCodeElements, allCodeTemplates);
+            Array.prototype.push.apply(allCodeElements, allCodePages);
+            Array.prototype.push.apply(allCodeElements, allCodeOrgansim);
+            for (var i = 0; i < allCodeElements.length; i++) {
+                var curElement = allCodeElements[i];
+                curElement.classList.remove('show');
+            }
+        }
+        Events.resetCode = resetCode;
+        // filter complete sections
+        function filterSections(event) {
+            // get current state
+            var session = SsgUI.Session.getCurrentState();
+            if (event === undefined) {
+                throw 'Filter cannot be selected';
+            }
+            event.preventDefault();
+            var curButton = event.srcElement;
+            resetFilterButtons(core.filter + ' .' + core.btnPrefix); // reset current selection
+            curButton.classList.add('active'); // select current button
+            var filter = getCurrentAction(curButton.id).toLocaleLowerCase();
+            var curSelection = Array.prototype.slice.call(document.querySelectorAll('div[data-cat=\'' + filter + '\']'));
+            // remove section selection
+            var btnToc = document.querySelector('#' + core.itemSelector + ' .' + core.btnPrefix);
+            // btnToc.classList.remove('active');
+            resetCode();
+            if (filter === 'organism' ||
+                filter === 'templates' ||
+                filter === 'pages') {
+                // cheange this to create a speciall view for current elements
+                showCurrentSelection(curSelection.slice(0, 1), session.uiOptions.showCode);
+                // Apply current filter
+                SsgUI.Render.itemSelector(filter);
+            }
+            else {
+                // Apply current selection
+                showCurrentSelection(curSelection);
+                var itemSelector = document.querySelector('.ssg-cmd-section #ssg-items');
+                if (itemSelector) {
+                    itemSelector.remove();
+                }
+            }
+            // enable UI Isolateion
+            session.currentFilter.type = filterType.category;
+            session.currentFilter.filter = filter;
+            // save current session
+            SsgUI.Session.saveCurrentState(session);
+        }
+        Events.filterSections = filterSections;
+        ;
+        function additionalTools(event) {
+            if (event === undefined) {
+                throw 'Event not fired';
+            }
+            event.preventDefault();
+            var curButton = event.srcElement;
+            var btnIsolate = core.btnPrefix + core.btnIsolate;
+            var isolateActive = document.getElementById(btnIsolate).classList.contains('active');
+            var action = getCurrentAction(curButton.id).toLowerCase();
+            var enable = true;
+            if (curButton.classList.contains('active')) {
+                enable = false;
+            }
+            switch (action) {
+                case 'isolate':
+                    showAnnotation(false);
+                    showCode(false);
+                    resetFilterButtons('#' + core.additionalTools.container + ' .' + core.btnPrefix);
+                    curButton.classList.toggle('active');
+                    isolatePatterns(enable);
+                    break;
+                case 'code':
+                    if (isolateActive === true) {
+                        resetFilterButtons('#' + core.additionalTools.container + ' .' + core.btnPrefix);
+                        isolatePatterns(false);
+                    }
+                    curButton.classList.toggle('active');
+                    isolatePatterns(false);
+                    showCode(enable);
+                    break;
+                case 'annotation':
+                    if (isolateActive === true) {
+                        resetFilterButtons('#' + core.additionalTools.container + ' .' + core.btnPrefix);
+                        isolatePatterns(false);
+                    }
+                    curButton.classList.toggle('active');
+                    showAnnotation(enable);
+                    break;
+                default:
+                    break;
+            }
+        }
+        Events.additionalTools = additionalTools;
+        ;
+        // enable responsive design tester
+        function enableDisco(event) {
+            event.preventDefault();
+            var discoBtn = event.srcElement, patternsContainer = 'ssg-patterns', patternsCtrl = document.getElementById(patternsContainer),
+            // patternsInnerContainer: string = 'ssg-patterns-inner',
+            // patternsInnerCtrl: HTMLElement = <HTMLElement>document.getElementById(patternsInnerContainer),
+            curWidth = window.innerWidth;
+            if (!discoBtn.classList.contains('active')) {
+                discoBtn.classList.add('active');
+                patternsCtrl.style.width = curWidth.toString();
+                SsgUI.UiUtils.discoMode();
+            }
+            else {
+                discoBtn.classList.remove('active');
+                SsgUI.UiUtils.discoMode();
+            }
+        }
+        Events.enableDisco = enableDisco;
+    })(Events = SsgUI.Events || (SsgUI.Events = {}));
+    var UiUtils;
+    (function (UiUtils) {
+        function discoMode() {
+            var curWidth, maxWidth = window.innerWidth, widthCtrl = document.getElementById(SsgUI.UiElements.viewport.width), patternsContainer = 'ssg-patterns', patternsCtrl = document.getElementById(patternsContainer), patternsInnerContainer = 'ssg-patterns-inner', patternsInnerCtrl = document.getElementById(patternsInnerContainer), discoBtn = document.getElementById('ssg-btn-disco');
+            if (patternsCtrl !== undefined
+                && patternsCtrl.classList.contains('animate') === false) {
+                patternsCtrl.classList.add('animate');
+            }
+            if (patternsInnerCtrl !== undefined
+                && patternsInnerCtrl.classList.contains('animate') === false) {
+                patternsInnerCtrl.classList.add('animate');
+            }
+            if (discoBtn !== undefined && discoBtn.classList.contains('active')) {
+                do {
+                    curWidth = Math.floor((Math.random() * maxWidth) + 1);
+                } while (curWidth < 320);
+                if (patternsCtrl !== undefined) {
+                    // assign current width
+                    if (widthCtrl !== undefined) {
+                        widthCtrl.value = curWidth.toString();
+                    }
+                    // assign default width
+                    patternsCtrl.style.width = curWidth.toString();
+                    patternsCtrl.style.minWidth = '0px';
+                }
+                // restart animation
+                window.setTimeout(function () {
+                    SsgUI.UiUtils.discoMode();
+                }, 1000);
+            }
+            else {
+                // temove style to resize to normal
+                patternsCtrl.style.width = '100%';
+                // delay and wait until resize finished and remove rest
+                setTimeout(function () {
+                    patternsCtrl.removeAttribute('style');
+                    patternsInnerCtrl.removeAttribute('style');
+                }, 1000);
+            }
+        }
+        UiUtils.discoMode = discoMode;
+        function getClosest(elem, selector) {
+            // Variables
+            var firstChar = selector.charAt(0);
+            var supports = 'classList' in document.documentElement;
+            var attribute, value;
+            // If selector is a data attribute, split attribute from value
+            if (firstChar === '[') {
+                selector = selector.substr(1, selector.length - 2);
+                attribute = selector.split('=');
+                if (attribute.length > 1) {
+                    value = true;
+                    attribute[1] = attribute[1].replace(/"/g, '').replace(/'/g, '');
+                }
+            }
+            // Get closest match
+            for (; elem && elem !== document && elem.nodeType === 1; elem = elem.parentNode) {
+                // If selector is a class
+                if (firstChar === '.') {
+                    if (supports) {
+                        if (elem.classList.contains(selector.substr(1))) {
+                            return elem;
+                        }
+                    }
+                    else {
+                        if (new RegExp('(^|\\s)' + selector.substr(1) + '(\\s|$)').test(elem.className)) {
+                            return elem;
+                        }
+                    }
+                }
+                // If selector is an ID
+                if (firstChar === '#') {
+                    if (elem.id === selector.substr(1)) {
+                        return elem;
+                    }
+                }
+                // If selector is a data attribute
+                if (firstChar === '[') {
+                    if (elem.hasAttribute(attribute[0])) {
+                        if (value) {
+                            if (elem.getAttribute(attribute[0]) === attribute[1]) {
+                                return elem;
+                            }
+                        }
+                        else {
+                            return elem;
+                        }
+                    }
+                }
+                // If selector is a tag
+                if (elem.tagName.toLowerCase() === selector) {
+                    return elem;
+                }
+            }
+            return null;
+        }
+        UiUtils.getClosest = getClosest;
+        ;
+    })(UiUtils = SsgUI.UiUtils || (SsgUI.UiUtils = {}));
+})(SsgUI || (SsgUI = {}));
+// start the party
+SsgUI.Render.renderUI();

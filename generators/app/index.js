@@ -33,11 +33,6 @@ module.exports = generators.Base.extend({
             name: 'atomic',
             message: 'Should folders for atomic design be created?',
             default: true
-        }, {
-            type: 'confirm',
-            name: 'https',
-            message: 'Should web server configure to use HTTPS?',
-            default: true
         }
         ]).then(function (answers) {
 
@@ -106,7 +101,7 @@ module.exports = generators.Base.extend({
 
             this.fs.copyTpl(
                 this.templatePath('ssgCore.templates.js'),
-                this.destinationPath('libs/ssgCore.templates.js'), {}
+                this.destinationPath('libs/scripts/ssgCore.templates.js'), {}
             );
 
             this.fs.copyTpl(
@@ -123,7 +118,6 @@ module.exports = generators.Base.extend({
                 this.templatePath('corev15.css'),
                 this.destinationPath('libs/styles/corev15.css'), {}
             );
-
 
         },
         copyLibs: function () {
