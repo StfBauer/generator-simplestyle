@@ -1,46 +1,39 @@
-# Simple Style Guide for SharePoint and Office 365 Development
+# Simple Style Guide Generator for SharePoint and Office 365 Development
 ![alt text][logo]
 
-This project aims to create a consisten Style Guide for SharePoint and Office 365 Development. It should sever as a documentation and development platform for every new SharePoint branding project.
-In future this aims to provide a Style Guide for the new SharePoint Framework too.
+This yeoman generator allows you to create a Style Guide for your SharePoint and Office 365 projects. It helps you to document all style changes you do in SharePoint and allows other developers to resuse already developed patterns.
 
 ## History
 
 *Current Version:*   0.1
 
 ## Installation
-To create a new project simply clone this repository.
 
-```git clone https://github.com/StfBauer/SimpleStyle.git```
 
-After cloning of this project have succeeded execute the following command
+`npm install -g generator-simplestyle`
 
-```
-cd SimpleStyle
-npm install && bower install
-```
-This will install all node packages and bower components. After that you are ready to use it. To start the web server simply run .
-```gulp serve```
-
-![Screenshot 1][screenshot]
+After you installed the yeoman generator you are able to create new style guide instances.
 
 ## Usage
-The following section should give you a brief overview how to use this style guide.
+After the yeoman generator have been installed a new project can be created on any empty folder by executing the following command:
+
+`yo simplestyle`
 
 ### Add and maintain patterns
 To store new pattern to the style guide simply add them in the folder
 
 ```
-app/_pattern
+app/_patterns
 ```
 
-This style guide follows the atomic design pattern and all pattern are organized in folders:
+This style guide follows the atomic design pattern and all pattern are organized in the following folders:
 
-```app/atoms
-app/molecules
-app/organism
-app/templates  
-app/pages
+```
+app/_patterns/atoms
+app/_patterns/molecules
+app/_patterns/organism
+app/_patterns/templates  
+app/_patterns/pages
 ```
 
 To add new pattern simply add a new HTML File with the file extension ".hbs" there. You can make full use of Handlebars in the template files.
@@ -67,17 +60,6 @@ All patterns are stored in the following format:
 
 In ever pattern the title and description property can be change manually to a proper name.
 Filename and file path will be used to find the pattern corresponding with the file.
-
-### Adding custom CSS
-
-All custom CSS use SASS as a preprocessor. The main file of the style guide is stored in the folder ```styles```.
-Other files of interest:
-
-* ```_corev15.scss - combined SharePoint Styles```
-* ```sp-design.scss - prefixed SASS file```
-
-All changes of files will precompiled and browser will refresh automatically.
-
 
 ## Credits
 Inspiration for this project came from [PatternLab.io](http://patternlab.io) and [Atomic Design](http://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost.
