@@ -1,5 +1,5 @@
 # Simple Style Guide Generator for SharePoint and Office 365 Development
-![alt text][logo]
+![logo][logo]
 
 This yeoman generator allows you to create a Style Guide for your SharePoint and Office 365 projects. It helps you to document all style changes you do in SharePoint and allows other developers to resuse already developed patterns.
 
@@ -18,6 +18,8 @@ After you installed the yeoman generator you are able to create new style guide 
 After the yeoman generator have been installed a new project can be created on any empty folder by executing the following command:
 
 `yo simplestyle`
+
+![yeoman generator][yeoman]
 
 ### Add and maintain patterns
 To store new pattern to the style guide simply add them in the folder
@@ -78,3 +80,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [logo]: https://github.com/StfBauer/SimpleStyle/blob/dev/docs/assets/simple-style.png?raw=true "Simple Style"
 [screenshot]: https://github.com/StfBauer/SimpleStyle/blob/dev/docs/assets/screenshot-simple-style.png?raw=true "Screen Shot"
+[yeoman]: https://github.com/StfBauer/generator-simplestyle/blob/dev/assets/yeoman-generator-first-run.png?raw=true
