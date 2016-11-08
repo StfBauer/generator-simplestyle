@@ -142,7 +142,7 @@ gulp.task('styles:core', function() {
 gulp.task('gen-config', function() {
 
     // var patternPath = config.patterns[0];
-    var patternPath = './app/_pattern/**/*.hbs';
+    var patternPath = './app/_patterns/**/*.hbs';
 
     var curConfig = {
         patterns: patternPath,

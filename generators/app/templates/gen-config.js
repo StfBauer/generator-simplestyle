@@ -14,6 +14,177 @@ var reload = browserSync.reload;
 
 module.exports = {
 
+    createConfig: function(options) {
+
+        var patternsData = [];
+        var folder = [];
+
+        var statistics = 0;
+
+        var handleDuplicates = function(data) {
+
+            var found = patternsData.filter(function(obj) {
+
+                return obj.filepath === data.filepath;
+
+            });
+
+            var filepath = data.filepath.split('/')[0];
+
+            if (found.length === 0) {
+
+                patternsData.push(data);
+
+            }
+
+        };
+
+        var updateConfig = function(event) {
+            if (event.type === 'deleted') {
+                console.log(event.path);
+            }
+        };
+
+        var createItem = function(file, enc, callback) {
+
+            var path = require('path');
+
+            // init pattern configs
+            var filename = path.basename(file.relative),
+                extension = path.extname(file.relative),
+                basename = filename.replace(extension, ''),
+                patternpath = path.dirname(file.relative),
+                title = basename.indexOf('_') === 0 ? basename.substr(1) : basename;
+
+            // create pattern object
+            var data = {
+                title: title,
+                description: '',
+                filename: basename,
+                filepath: file.relative
+            };
+
+            this.push(data);
+
+            callback();
+
+        };
+
+        var writeConfigToFile = function() {
+
+            console.log('pattern sort');
+            patternsData = patternsData.sort(function(a, b) {
+                if (a.filepath < b.filepath)
+                    return -1;
+                else if (a.filepath > b.filepath)
+                    return 1;
+                else
+                    return 0;
+            });
+            console.log('pattern sort');
+
+            var patternConfig = {
+                patterns: patternsData,
+                folder: [{
+                    'name': 'atoms',
+                    'description': 'Contains all atom elements'
+                }, {
+                    'name': 'molecules',
+                    'description': 'Contains all molecule elements'
+                }, {
+                    'name': 'organism',
+                    'description': 'Contains all organism elements'
+                }, {
+                    'name': 'templates',
+                    'description': 'Contains all templates elements'
+                }, {
+                    'name': 'pages',
+                    'description': 'Contains all pages elements'
+                }]
+            };
+
+            var patterns = JSON.stringify(patternConfig, null, 4);
+
+            fs.writeFile(options.configFile, patterns, function(err) {
+
+                if (err) {
+                    return plugins.util.log(
+                        plugins.util.colors.red(err)
+                    );
+                }
+
+                plugins.util.log(
+                    plugins.util.colors.green('The file was saved!')
+                );
+
+                precompile(config.ssg);
+
+            });
+        };
+
+        var logData = function() {
+
+            console.log(statistics);
+            console.log(patternsData.length);
+            console.log(patternsData);
+            writeConfigToFile();
+        };
+
+        var loadConfig = (function() {
+
+            plugins.util.log('... Loading current configuration');
+
+            var curConfigPath = options.configFile;
+
+            var exists;
+
+            try {
+
+                exists = fs.statSync(curConfigPath);
+
+            } catch (erro) {
+
+                exists = null;
+                return;
+
+            }
+
+            try {
+
+                // Loading old configuration
+                var config = fs.readFileSync(options.configFile);
+
+                // parse json config
+                var configData = JSON.parse(config);
+
+                // check if configuration data exits
+                patternsData = configData !== undefined &&
+                    configData.patterns !== undefined ? configData.patterns : [];
+
+                plugins.util.log(
+                    'Found',
+                    patternsData.length,
+                    'pattern(s) in current configuration.');
+
+                statistics = patternsData.length;
+
+            } catch (err) {
+
+                plugins.util.log(plugins.util.colors.red(err));
+
+            }
+        }());
+
+        return gulp.src(options.patterns, {
+                read: false
+            })
+            .pipe(plugins.plumber())
+            .pipe(plugins.print())
+            .pipe(through2.obj(createItem))
+            .on('data', handleDuplicates)
+            .on('end', logData);
+    },
+
     fsEvents: function(event, config) {
 
         var patternConfigPath = process.cwd() + '/' + config.patternConfig,
@@ -192,7 +363,7 @@ module.exports = {
 
         };
 
-        /* 
+        /*
             Handle all file events
         */
         var added = function(file) {
