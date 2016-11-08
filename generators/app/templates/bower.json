@@ -1,0 +1,29 @@
+{
+    "name": "simplestyle",
+    "description": "Simple Style Guide Tool based on Atomic Web Design",
+    "authors": [
+        "Stefan Bauer"
+    ],
+    "license": "MIT",
+    "keywords": [
+        "Atomic",
+        "Design",
+        "Style",
+        "Guide",
+        "Web",
+        "Desgin",
+        "Pattern",
+        "UI",
+        "UX"
+    ],
+    "homepage": "https://github.com/StfBauer/SimpleStyle",
+    "moduleType": [
+        "node"
+    ],
+    "private": true,
+    "dependencies": {
+        "modernizer": "~2.8.2",
+        "handlebars": "~4.0.5",
+        "prism": "^1.5.1"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "patterns": [
+
+
+    ],
+    "folder": [{
+        "name": "atoms",
+        "description": "Contains all atom elements"
+    }, {
+        "name": "molecules",
+        "description": "Contains all molecule elements"
+    }, {
+        "name": "organism",
+        "description": "Contains all organism elements"
+    }, {
+        "name": "templates",
+        "description": "Contains all templates elements"
+    }, {
+        "name": "pages",
+        "description": "Contains all pages elements"
+    }]
+}
