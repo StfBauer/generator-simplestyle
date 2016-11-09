@@ -4,7 +4,8 @@
     "description": "Simple Style Guide Tool based on Atomic Web Design",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "postinstall": "gulp gen-config"
     },
     "repository": {
         "type": "git",
@@ -64,8 +65,5 @@
     "dependencies": {
         "gulp-load-plugins": "^1.1.0",
         "npm": "^3.5.3"
-    },
-    "script": {
-        "postinstall": "gulp gen-config"
     }
 }
