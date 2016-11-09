@@ -64,5 +64,8 @@
     "dependencies": {
         "gulp-load-plugins": "^1.1.0",
         "npm": "^3.5.3"
+    },
+    "script": {
+        "postinstall": "gulp gen-config"
     }
 }
