@@ -72,7 +72,7 @@ module.exports = {
 
         var writeConfigToFile = function() {
 
-            console.log('pattern sort');
+
             patternsData = patternsData.sort(function(a, b) {
                 if (a.filepath < b.filepath)
                     return -1;
@@ -81,7 +81,6 @@ module.exports = {
                 else
                     return 0;
             });
-            console.log('pattern sort');
 
             var patternConfig = {
                 patterns: patternsData,
@@ -124,10 +123,8 @@ module.exports = {
 
         var logData = function() {
 
-            console.log(statistics);
-            console.log(patternsData.length);
-            console.log(patternsData);
             writeConfigToFile();
+
         };
 
         var loadConfig = (function() {
