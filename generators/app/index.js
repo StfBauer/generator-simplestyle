@@ -47,12 +47,12 @@ module.exports = generators.Base.extend({
         core: function () {
 
             this.fs.copyTpl(
-                this.templatePath('.bowerrc'),
+                this.templatePath('bowerrc'),
                 this.destinationPath('.bowerrc'), {}
             );
 
             this.fs.copyTpl(
-                this.templatePath('.gitignore'),
+                this.templatePath('gitignore'),
                 this.destinationPath('.gitignore'), {}
             );
 
