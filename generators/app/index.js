@@ -2,7 +2,7 @@
 var fs = require('fs'),
     chalk = require('chalk'),
     helper = require('./helpers'),
-    updateNotifier = require('updated-notifier'),
+    updateNotifier = require('update-notifier'),
     welcome = require('./welcome')();
 
 var generators = require('yeoman-generator');
