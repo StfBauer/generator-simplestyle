@@ -106,7 +106,7 @@ module.exports = {
 
             if(patterns.indexOf('\\') !== -1){
                 console.log('Patterns contains moses');
-                patterns.replace(new RegExp('\\', 'g'), '/');
+                patterns.replace(new RegExp('\\\\', 'g'), '/');
             }
 
             fs.writeFile(options.configFile, patterns, function(err) {
