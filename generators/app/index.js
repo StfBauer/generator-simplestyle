@@ -17,6 +17,9 @@ module.exports = generators.Base.extend({
 
         this.log(welcome.welcome);
 
+        var update = updateNotifier({ pkg });
+        update.notify({defer: false}); // turns defer to false
+
     },
     // Ask user for input
     prompting: function () {
