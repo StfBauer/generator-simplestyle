@@ -3,7 +3,7 @@ var fs = require('fs'),
     chalk = require('chalk'),
     helper = require('./helpers'),
     updateNotifier = require('update-notifier'),
-    pkg = require('./package.json');
+    pkg = require('../../package.json');
     welcome = require('./welcome')();
 
 var generators = require('yeoman-generator');
