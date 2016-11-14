@@ -106,6 +106,7 @@ module.exports = {
 
             if(patterns.indexOf('\\') !== -1){
                 patterns = patterns.replace(new RegExp('\\\\', 'g'), '/');
+                patterns = patterns.replace(new RegExp('//', 'g'), '/');
             }
 
             fs.writeFile(options.configFile, patterns, function(err) {
