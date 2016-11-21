@@ -32,7 +32,7 @@ var checkJSStyle = function(files) {
     gulp.src(files)
         .pipe($.plumber())
         .pipe($.if(args.verbose, $.print()))
-        .pipe($.jscs())
+        // .pipe($.jscs())
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'), {
             verbose: true
@@ -115,7 +115,7 @@ gulp.task('clean', function(done) {
 gulp.task('styles', function() {
 
     var baseStyleOptions = {
-        src: 'app/styles/*.scss',
+        src: 'app/styles/**/*.scss',
         base: './app/styles/'
     };
 
@@ -142,7 +142,7 @@ gulp.task('styles:core', function() {
 gulp.task('gen-config', function() {
 
     // var patternPath = config.patterns[0];
-    var patternPath = './app/_patterns/**/*.hbs';
+    var patternPath = './app/_pattern/**/*.hbs';
 
     var curConfig = {
         patterns: patternPath,
@@ -261,27 +261,13 @@ gulp.task('vet-dev', function() {
 
 });
 
-gulp.task('wiredep', () => {
-    // Inject into CSS files
-    gulp.src('app/styles/*.scss')
-        .pipe(wiredep({
-            ignorePath: /^(\.\.\/)+/
-        }))
-        .pipe(gulp.dest('app/styles'));
-    // Inject into html files
-    gulp.src('app/*.html')
-        .pipe(wiredep({
-            ignorePath: /^(\.\.\/)*\.\./
-        }))
-        .pipe(gulp.dest('app'));
-});
-
-
 // compile handlebar patterns
 gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core', 'precompile:ssg', 'vet'], function() {
 
     gulp.watch('app/_patterns/**/*.hbs', function(event) {
+
         ssgCoreConfig.fsEvents(event, config);
+
     });
 
     // Recompile pattern
@@ -293,13 +279,16 @@ gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core'
 
     gulp.watch(['app/_config/*.json'], ['precompile:ssg'], reload);
 
+    // gulp.watch('app/_core/**/*.js', ['ssgCore-update'], reload);
+
+    // gulp.watch('app/_core/styles/*.scss', ['styles:core'], reload);
     gulp.watch('./app/styles/**/*.scss', ['styles'], reload);
 
     browserSync({
         notify: false,
         port: 9000,
         server: {
-            baseDir: ['app', 'libs', '.tmp'],
+            baseDir: ['libs', '.tmp', 'app'],
             routes: {
                 '/bower_components': 'bower_components',
                 '/tmp': '/',
