@@ -10,7 +10,7 @@ This yeoman generator allows you to create a Style Guide for your SharePoint and
 ## Installation
 
 
-`npm install -g generator-simplestyle bower gulp`
+`npm install -g generator-simplestyle bower gulp jslint`
 
 After you installed the yeoman generator you are able to create new style guide instances.
 
@@ -34,14 +34,14 @@ This style guide follows the atomic design pattern and all pattern are organized
 app/_patterns/atoms
 app/_patterns/molecules
 app/_patterns/organism
-app/_patterns/templates  
+app/_patterns/templates
 app/_patterns/pages
 ```
 
 To add new pattern simply add a new HTML File with the file extension ".hbs" there. You can make full use of Handlebars in the template files.
 When the web server is running the files will be picked up by a gulp task and automatically added to the configuration.
 
-The pattern configuration is stored in the path: 
+The pattern configuration is stored in the path:
 
 ```
 app/_config/pattern.conf.json
