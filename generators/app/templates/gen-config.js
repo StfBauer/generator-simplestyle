@@ -103,6 +103,12 @@ module.exports = {
 
             var patterns = JSON.stringify(patternConfig, null, 4);
 
+            // Fixing w32 path names
+            if(patterns.indexOf('\\') !== -1){
+                patterns = patterns.replace(new RegExp('\\\\', 'g'), '/');
+                patterns = patterns.replace(new RegExp('//', 'g'), '/');
+            }
+
             fs.writeFile(options.configFile, patterns, function (err) {
 
                 if (err) {
