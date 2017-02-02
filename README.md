@@ -1,4 +1,8 @@
 # Simple Style Guide Generator for SharePoint and Office 365 Development
+
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/yosimplestyle/)
+[![Slack](https://img.shields.io/badge/slack-join_the_conversation-red.svg)](https://simplestyleteam.slack.com/signup)
+
 ![logo][logo]
 
 This yeoman generator allows you to create a Style Guide for your SharePoint and Office 365 projects. It helps you to document all style changes you do in SharePoint and allows other developers to resuse already developed patterns.
