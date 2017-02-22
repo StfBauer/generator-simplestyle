@@ -326,7 +326,7 @@ module.exports = {
             if (renamedPattern.length !== 0) {
 
                 delete renamedPattern[0].deleted;
-                renamedPattern[0].filename = newFile;
+                renamedPattern[0].filename = newFilenameNoExt;
                 renamedPattern[0].filepath = newRelPath;
 
                 patternConfig.patterns = curConfig;

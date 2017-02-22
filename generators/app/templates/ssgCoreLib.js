@@ -221,8 +221,13 @@ var SsgUI;
                 // generate base filter value
                 // assign base filter
                 patternElement.baseFilter = patternElement.filepath.split('/')[0];
-                // assign pattern content
-                patternElement.sample = ssg.templates[patternElement.filename]();
+                try {
+                    // assign pattern content
+                    patternElement.sample = ssg.templates[patternElement.filename]();
+                }
+                catch (error) {
+                    console.log("ERROR: Current file: " + patternElement.filename);
+                }
                 // generatore content
                 var patternContent = ssgCore.templates.patternItem(patternElement);
                 allPatternContent += patternContent;
