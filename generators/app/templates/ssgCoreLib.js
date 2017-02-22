@@ -215,6 +215,10 @@ var SsgUI;
             var allPatternContent = '';
             // fetch base container
             var baseContainer = document.getElementById(core.baseContainer);
+            // remove deleted form displaying
+            config.patterns = config.patterns.filter(function (object) {
+                return object["deleted"] === undefined;
+            });
             for (var index = 0; index < config.patterns.length; index++) {
                 // fetch current element
                 var patternElement = config.patterns[index];
@@ -238,7 +242,9 @@ var SsgUI;
         Render.renderPatterns = renderPatterns;
         ;
         function renderToc(config) {
-            var patterns = config.patterns, folder = config.folder, ssgToc = document.getElementById(SsgUI.UiElements.toc);
+            var patterns = config.patterns.filter(function (object) {
+                return object["deleted"] === undefined;
+            }), folder = config.folder, ssgToc = document.getElementById(SsgUI.UiElements.toc);
             for (var i = 0; i < folder.length; i++) {
                 var baseElement = '<ul><li id=ssg-' + folder[i].name + ' class=ssg-toc-header>' +
                     folder[i].name +

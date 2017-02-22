@@ -274,6 +274,9 @@ module.exports = {
         // create pattern item
         var createPatternItem = function (file) {
 
+            // clean up deleted first
+            cleanUpDeleted();
+
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
                 relPath = normalizeFilePath(path.relative(appPath, file));
@@ -318,6 +321,9 @@ module.exports = {
 
         var renamePatternItem = function (files) {
 
+            // clean up deleted first
+            cleanUpDeleted();
+
             var curConfig = patternConfig.patterns,
                 // Old file
                 oldFile = path.basename(files.old),
@@ -352,6 +358,9 @@ module.exports = {
         };
 
         var deletePatternItem = function (file) {
+
+            // clean up deleted first
+            cleanUpDeleted();
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
@@ -396,6 +405,9 @@ module.exports = {
         // pattern change handler
         var changed = function (file) {
 
+            // clean up deleted first
+            cleanUpDeleted();
+
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
                 relPath = normalizeFilePath(path.relative(appPath, file)),
@@ -420,6 +432,14 @@ module.exports = {
             }
 
         };
+
+        var cleanUpDeleted = function () {
+
+            patternConfig.patterns = patternConfig.patterns.filter(function (object) {
+                return object["deleted"] === undefined || object.deleted !== true;
+            });
+
+        }
 
         // filepath
         var normalizeFilePath = function (filepath) {
