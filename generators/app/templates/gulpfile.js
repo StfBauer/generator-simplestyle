@@ -289,6 +289,10 @@ gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core'
         port: 9000,
         server: {
             baseDir: ['libs', '.tmp', 'app'],
+            middleware: function (req, res, next) {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                next();
+            },
             routes: {
                 '/bower_components': 'bower_components',
                 '/tmp': '/',
