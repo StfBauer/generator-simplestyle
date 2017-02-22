@@ -321,9 +321,6 @@ module.exports = {
 
         var renamePatternItem = function (files) {
 
-            // clean up deleted first
-            cleanUpDeleted();
-
             var curConfig = patternConfig.patterns,
                 // Old file
                 oldFile = path.basename(files.old),
@@ -350,6 +347,9 @@ module.exports = {
                     plugins.util.colors.cyan(' was renamed to ') +
                     newFile
                 );
+
+                // clean up deleted first
+                cleanUpDeleted();
 
                 saveConfig(patternConfig);
 
