@@ -104,7 +104,7 @@ module.exports = {
             var patterns = JSON.stringify(patternConfig, null, 4);
 
             // Fixing w32 path names
-            if(patterns.indexOf('\\') !== -1){
+            if (patterns.indexOf('\\') !== -1) {
                 patterns = patterns.replace(new RegExp('\\\\', 'g'), '/');
                 patterns = patterns.replace(new RegExp('//', 'g'), '/');
             }
@@ -179,11 +179,11 @@ module.exports = {
                 plugins.util.log(plugins.util.colors.red(err));
 
             }
-        } ());
+        }());
 
         return gulp.src(options.patterns, {
-            read: false
-        })
+                read: false
+            })
             .pipe(plugins.plumber())
             .pipe(plugins.print())
             .pipe(through2.obj(createItem))
@@ -276,7 +276,7 @@ module.exports = {
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
-                relPath = path.relative(appPath, file);
+                relPath = normalizeFilePath(path.relative(appPath, file));
 
             var newPattern = {
                 title: filenameNoExt,
@@ -286,6 +286,13 @@ module.exports = {
             };
 
             var curConfig = patternConfig.patterns;
+
+            // Fixing w32 path names
+            if (relPath.indexOf('\\') !== -1) {
+                relPath = relPath.replace(new RegExp('\\\\', 'g'), '/');
+                relPath = relPath.replace(new RegExp('//', 'g'), '/');
+            }
+
 
             var patternExists = selectPatternByPath(curConfig, relPath);
 
@@ -315,11 +322,11 @@ module.exports = {
                 // Old file
                 oldFile = path.basename(files.old),
                 oldFilenameNoExt = trimExtension(oldFile),
-                oldRelPath = path.relative(appPath, files.old),
+                oldRelPath = normalizeFilePath(path.relative(appPath, files.old)),
                 // renamed file
                 newFile = path.basename(files.path),
                 newFilenameNoExt = trimExtension(newFile),
-                newRelPath = path.relative(appPath, files.path);
+                newRelPath = normalizeFilePath(path.relative(appPath, files.path));
 
             var renamedPattern = selectPatternByPath(curConfig, oldRelPath);
 
@@ -348,7 +355,7 @@ module.exports = {
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
-                relPath = path.relative(appPath, file),
+                relPath = normalizeFilePath(path.relative(appPath, file)),
                 curConfig = patternConfig.patterns;
 
             var deletedPattern = selectPatternByPath(curConfig, relPath);
@@ -391,7 +398,7 @@ module.exports = {
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
-                relPath = path.relative(appPath, file),
+                relPath = normalizeFilePath(path.relative(appPath, file)),
                 changedItem = patternConfig.patterns.filter(function (object) {
                     return object.filepath === relPath;
                 });
@@ -413,6 +420,16 @@ module.exports = {
             }
 
         };
+
+        // filepath
+        var normalizeFilePath = function (filepath) {
+            if (filepath.indexOf('\\') !== -1) {
+                filepath = filepath.replace(new RegExp('\\\\', 'g'), '/');
+                filepath = filepath.replace(new RegExp('//', 'g'), '/');
+            }
+
+            return filepath;
+        }
 
         switch (event.type) {
             case 'added':
