@@ -4,7 +4,7 @@ var fs = require('fs'),
     helper = require('./helpers'),
     updateNotifier = require('update-notifier'),
     pkg = require('../../package.json'),
-    welcome = require('./welcome')();
+    welcome = require('assets/welcome')();
 
 var generators = require('yeoman-generator');
 
@@ -50,11 +50,6 @@ module.exports = generators.Base.extend({
     writing: {
 
         core: function () {
-
-            this.fs.copyTpl(
-                this.templatePath('bowerrc'),
-                this.destinationPath('.bowerrc'), {}
-            );
 
             this.fs.copyTpl(
                 this.templatePath('gitignore'),
