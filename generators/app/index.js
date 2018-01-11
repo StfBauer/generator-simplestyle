@@ -93,9 +93,7 @@ module.exports = generators.Base.extend({
 
             this.fs.copyTpl(
                 this.templatePath('main.css'),
-                this.destinationPath('app/styles/main.scss'), {
-                    bowerComponents: '// bower:scss\r\n// endbower'
-                }
+                this.destinationPath('app/styles/main.scss')
             );
 
         },
