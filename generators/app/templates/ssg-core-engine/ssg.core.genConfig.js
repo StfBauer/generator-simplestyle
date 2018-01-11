@@ -4,6 +4,7 @@ var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')({
         lazy: true
     }),
+    log = require('fancy-log'),
     config = require('../ssg.core.config.js'),
     chalk = require('chalk'),
     browserSync = require('browser-sync'),
@@ -40,15 +41,15 @@ module.exports = {
         };
 
         var updateConfig = function(event) {
-            console.log('Update Config:::');
+            log('Update Config:::');
             if (event.type === 'deleted') {
-                console.log(event.path);
+                log(event.path);
             }
         };
 
         var createItem = function(file, enc, callback) {
 
-            // console.log('Create Item:::');
+            // log('Create Item:::');
 
             var path = require('path');
 
@@ -115,13 +116,13 @@ module.exports = {
             fs.writeFile(options.configFile, patterns, function(err) {
 
                 if (err) {
-                    return plugins.util.log(
-                        plugins.util.colors.red(err)
+                    return log(
+                        chalk.red(err)
                     );
                 }
 
-                plugins.util.log(
-                    plugins.util.colors.green('Configuration saved!')
+                log(
+                    chalk.green('Configuration saved!')
                 );
 
                 precompile(config.ssg);
@@ -131,17 +132,17 @@ module.exports = {
 
         var logData = function() {
 
-            console.log(
-                plugins.util.colors.green('Patterns before: '), statistics);
-            console.log(
-                plugins.util.colors.green('Patterns after:  '), patternsData.length);
+            log(
+                chalk.green('Patterns before: '), statistics);
+            log(
+                chalk.green('Patterns after:  '), patternsData.length);
 
             writeConfigToFile();
         };
 
         var loadConfig = (function() {
 
-            plugins.util.log('... Loading current configuration');
+            log('... Loading current configuration');
 
             var curConfigPath = options.configFile;
 
@@ -171,9 +172,9 @@ module.exports = {
                     configData.patterns !== undefined ? configData.patterns : [];
 
                 // Pattern Data
-                // console.log(patternsData);
+                // log(patternsData);
 
-                plugins.util.log(
+                log(
                     'Found',
                     patternsData.length,
                     'pattern(s) in current configuration.');
@@ -182,7 +183,7 @@ module.exports = {
 
             } catch (err) {
 
-                plugins.util.log(plugins.util.colors.red(err));
+                log(chalk.red(err));
 
             }
         }());
@@ -205,22 +206,22 @@ module.exports = {
 
         var patternPrecompile = function() {
 
-            plugins.util.log(
-                plugins.util.colors.green('Precompile Patterns')
+            log(
+                chalk.green('Precompile Patterns')
             );
 
             precompile(config.ssg)
                 .on('error', function(a, b, c) {
 
-                    plugins.util.log(
-                        plugins.util.colors.green('Precompilation failed.')
+                    log(
+                        chalk.green('Precompilation failed.')
                     );
 
                 })
                 .on('end', function() {
 
-                    plugins.util.log(
-                        plugins.util.colors.green('Precompilation finished.')
+                    log(
+                        chalk.green('Precompilation finished.')
                     );
 
                     reload();
@@ -236,7 +237,7 @@ module.exports = {
 
         // renames files in pattern config
         var renamePattern = function(files) {
-            console.log('Rename Item:::');
+            log('Rename Item:::');
         };
 
         var trimExtension = function(file) {
@@ -263,13 +264,13 @@ module.exports = {
             fs.writeFile(patternConfigPath, patterns, function(err) {
 
                 if (err) {
-                    return plugins.util.log(
-                        plugins.util.colors.red(err)
+                    return log(
+                        chalk.red(err)
                     );
                 }
 
-                plugins.util.log(
-                    plugins.util.colors.green('Configuration updated')
+                log(
+                    chalk.green('Configuration updated')
                 );
 
                 patternPrecompile();
@@ -312,10 +313,10 @@ module.exports = {
                 patternConfig.patterns = curConfig;
             }
 
-            plugins.util.log(
-                plugins.util.colors.green('Pattern ') +
+            log(
+                chalk.green('Pattern ') +
                 filename +
-                plugins.util.colors.green(' was added')
+                chalk.green(' was added')
             );
 
             saveConfig(patternConfig);
@@ -324,7 +325,7 @@ module.exports = {
 
         var renamePatternItem = function(files) {
 
-            console.log('Rename Pattern Item:::');
+            log('Rename Pattern Item:::');
 
             var curConfig = patternConfig.patterns,
                 // Old file
@@ -346,10 +347,10 @@ module.exports = {
 
                 patternConfig.patterns = curConfig;
 
-                plugins.util.log(
-                    plugins.util.colors.cyan('Pattern file ') +
+                log(
+                    chalk.cyan('Pattern file ') +
                     oldFile +
-                    plugins.util.colors.cyan(' was renamed to ') +
+                    chalk.cyan(' was renamed to ') +
                     newFile
                 );
 
@@ -361,7 +362,7 @@ module.exports = {
 
         var deletePatternItem = function(file) {
 
-            console.log('Delete Pattern Item:::');
+            log('Delete Pattern Item:::');
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
@@ -374,10 +375,10 @@ module.exports = {
 
                 deletedPattern[0].deleted = true;
 
-                plugins.util.log(
-                    plugins.util.colors.yellow('Pattern ') +
+                log(
+                    chalk.yellow('Pattern ') +
                     deletedPattern[0].title +
-                    plugins.util.colors.yellow(' was marked for deletetion')
+                    chalk.yellow(' was marked for deletetion')
                 );
 
                 saveConfig(patternConfig);
@@ -390,38 +391,38 @@ module.exports = {
             Handle all file events
         */
         var added = function(file) {
-            console.log('File added');
+            log('File added');
             try {
                 createPatternItem(file);
             } catch (Exception) {
-                console.log(Exception)
+                log(Exception)
             }
         };
 
         // pattern rename handler
         var renamed = function(files) {
-            console.log('File rename');
+            log('File rename');
             try {
                 renamePatternItem(files);
             } catch (Exception) {
-                console.log(Exception)
+                log(Exception)
             }
         };
 
         // pattern delete handler
         var deleted = function(file) {
-            console.log('File delete');
+            log('File delete');
             try {
                 deletePatternItem(file);
             } catch (Exception) {
-                console.log(Exception)
+                log(Exception)
             }
         };
 
         // pattern change handler
         var changed = function(file) {
 
-            console.log('Rename Pattern Item:::');
+            log('Rename Pattern Item:::');
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
@@ -433,10 +434,10 @@ module.exports = {
             // Check if pattern exists otherwise add it as new pattern
             if (changedItem.length === 1) {
 
-                plugins.util.log(
-                    plugins.util.colors.cyan('Pattern ') +
+                log(
+                    chalk.cyan('Pattern ') +
                     changedItem[0].title +
-                    plugins.util.colors.cyan(' was changed')
+                    chalk.cyan(' was changed')
                 );
 
                 patternPrecompile();
@@ -459,35 +460,35 @@ module.exports = {
         }
 
 
-        console.log("Current Page ::: ", event.path);
+        log("Current Page ::: ", event.path);
         // Check if path exists just in case 
         if (fs.existsSync(event.path)) {
             // Getting file stats
             var file = fs.statSync(event.path);
 
             if(file.isDirectory()){
-                console.log('Directory added');
+                log('Directory added');
                 return;
             }
         }
 
-        console.log('EVENT TYPE ::: ', event.type);
+        log('EVENT TYPE ::: ', event.type);
 
         switch (event.type) {
             case 'added':
-                console.log('ADDED Pattern Item:::');
+                log('ADDED Pattern Item:::');
                 added(event.path);
                 break;
             case 'changed':
-                console.log('CHANGED Pattern Item:::');
+                log('CHANGED Pattern Item:::');
                 changed(event.path);
                 break;
             case 'deleted':
-                console.log('DELETED Pattern Item:::');
+                log('DELETED Pattern Item:::');
                 deleted(event.path);
                 break;
             case 'renamed':
-                console.log('RENAMED Pattern Item:::');
+                log('RENAMED Pattern Item:::');
                 renamed(event);
                 break;
         }

@@ -5,7 +5,9 @@ const fs = require('fs'),
     chalk = require('chalk'),
     helper = require('./helpers'),
     updateNotifier = require('update-notifier'),
+    commandExists = require('command-exists'),
     pkg = require('../../package.json'),
+    mkdirp = require('mkdirp'),
     welcome = require('./assets/welcome')();
 
 const generators = require('yeoman-generator');
@@ -97,12 +99,19 @@ module.exports = class extends Generator {
     }
 
     writing() {
-        // this._debug();
+        this._debug();
         this._writeGulpFile();
         this._writePackageJSON();
         this._writeGit();
+        this._writeTypeScriptConfig();
         this._writeSSGEngine();
         this._writeSSGUI();
+        this._writeSSGConfig();
+        this._writeStyles();
+        this._writeScripts();
+        this._createAppFolders();
+        this._addSampleData();
+
     }
 
     _debug() {
@@ -219,6 +228,153 @@ module.exports = class extends Generator {
         });
 
     }
+    /**
+     * Save base configuration to project
+     */
+    _writeSSGConfig(){
+        this.fs.copy(
+            this.templatePath('ssg.core.config.js'),
+            this.destinationPath('ssg.core.config.js')
+        )
+    }
+    /**
+     * Create base app folder
+     */
+    _createAppFolders() {
+
+        /* Base folder */
+        mkdirp('app/fonts');
+        mkdirp('app/images');
+        mkdirp('app/scripts');
+        mkdirp('app/styles');
+
+        /* Folder for enginge */
+        mkdirp('app/_documentation');
+        mkdirp('app/_config');
+        mkdirp('app/_patterns');
+
+    }
+
+    /**
+     * Adds sample data to the current aplication folder
+     */
+    _addSampleData() {
+        // Copy add atoms
+        this.fs.copy(
+            this.templatePath('01-atom.hbs'),
+            this.destinationPath('app/_patterns/atoms/01-atom.hbs')
+        );
+        // Copy add molecule
+        this.fs.copy(
+            this.templatePath('01-molecule.hbs'),
+            this.destinationPath('app/_patterns/molecules/01-molecule.hbs')
+        );
+        // Copy add organism
+        this.fs.copy(
+            this.templatePath('01-organism.hbs'),
+            this.destinationPath('app/_patterns/organisms/01-organism.hbs')
+        );
+        // Copy add page
+        this.fs.copy(
+            this.templatePath('01-page.hbs'),
+            this.destinationPath('app/_patterns/pages/01-page.hbs')
+        );
+
+
+        // Copy add atom documentation
+        this.fs.copy(
+            this.templatePath('01-atom.md'),
+            this.destinationPath('app/_documentation/atoms/01-atom.md')
+        );
+        // Copy add molecule documentation
+        this.fs.copy(
+            this.templatePath('01-molecule.md'),
+            this.destinationPath('app/_documentation/molecules/01-molecule.md')
+        );
+        // Copy add organism documentation
+        this.fs.copy(
+            this.templatePath('01-organism.md'),
+            this.destinationPath('app/_documentation/organisms/01-organism.md')
+        );
+        // Copy add page documentation
+        this.fs.copy(
+            this.templatePath('01-page.md'),
+            this.destinationPath('app/_documentation/pages/01-page.md')
+        );
+
+    }
+
+    /**
+     * Write default styles to app/styles
+     */
+    _writeStyles() {
+
+        let filename = 'main';
+        if (this.includeSASS) {
+            filename += '.scss';
+        } else {
+            filename += '.css';
+        }
+
+        this.fs.copy(
+            this.templatePath('.stylelintrc'),
+            this.destinationPath('.stylelintrc')
+        );
+
+        this.fs.copy(
+            this.templatePath('main.scss'),
+            this.destinationPath('app/styles/' + filename)
+        );
+
+    }
+
+    /**
+     * Write default styles to app/scripts
+     */
+    _writeScripts() {
+
+        let filename = 'main';
+
+        if (this.includeTypeScript) {
+            filename += '.ts';
+        } else {
+            filename += '.js';
+        }
+
+        this.fs.copy(
+            this.templatePath('main.js'),
+            this.destinationPath('app/scripts/' + filename)
+        );
+    }
+
+    _writeTypeScriptConfig() {
+
+        var files = [
+            'tsconfig.json',
+            'tslint.json',
+            'typings.json'
+        ]
+
+        files.forEach(file => {
+            this.fs.copy(
+                this.templatePath('typescript/', file),
+                this.destinationPath(file)
+            );
+        });
+
+    }
+
+    install() {
+        const hasYarn = commandExists('yarn');
+        this.installDependencies({
+            npm: !hasYarn,
+            bower: false,
+            yarn: hasYarn,
+            skipMessage: this.options['skip-install-message'],
+            skipInstall: this.options['skip-install']
+        });
+    }
+
 }
 
 // module.exports = generators.Base.extend({
