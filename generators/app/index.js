@@ -111,7 +111,7 @@ module.exports = class extends Generator {
         this._writeScripts();
         this._createAppFolders();
         this._addSampleData();
-
+        this._writeHtml();
     }
 
     _debug() {
@@ -231,7 +231,7 @@ module.exports = class extends Generator {
     /**
      * Save base configuration to project
      */
-    _writeSSGConfig(){
+    _writeSSGConfig() {
         this.fs.copy(
             this.templatePath('ssg.core.config.js'),
             this.destinationPath('ssg.core.config.js')
@@ -327,7 +327,6 @@ module.exports = class extends Generator {
         );
 
     }
-
     /**
      * Write default styles to app/scripts
      */
@@ -346,7 +345,9 @@ module.exports = class extends Generator {
             this.destinationPath('app/scripts/' + filename)
         );
     }
-
+    /**
+     * Write TypeScript configuration
+     */
     _writeTypeScriptConfig() {
 
         var files = [
@@ -363,6 +364,16 @@ module.exports = class extends Generator {
         });
 
     }
+    /** 
+     * Write HTML
+     */
+    _writeHtml() {
+        this.fs.copy(
+            this.templatePath('index.html'),
+            this.destinationPath('app/index.html')
+        );
+    }
+
 
     install() {
         const hasYarn = commandExists('yarn');

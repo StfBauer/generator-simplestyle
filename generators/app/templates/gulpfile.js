@@ -12,7 +12,8 @@ const gulp = require('gulp'),
 
 /* Core Simple Style Guide engine */
 const ssgCore = require('./ssg-core-engine/ssg.core.precompile'),
-    ssgCoreConfig = require('./ssg-core-engine/ssg.core.genConfig');
+    ssgCoreConfig = require('./ssg-core-engine/ssg.core.genConfig'),
+    ssgCoreHelper = require('./ssg-core-engine/ssg.core.helpers');
 
 /* Browser Sync */
 const browserSync = require('browser-sync'),
@@ -92,20 +93,21 @@ gulp.task('doc:markdown', () => {
             pedantic: true,
             smartypants: true
         }))
-        .pipe(jsoncombine(config.documentation.path, function (data) {
+        .pipe(jsoncombine(config.documentation.path, function (data, meta) {
 
             var keys = [],
                 name,
                 newDocData = {};
 
-            for (name in data) {
+            for (name in meta) {
 
-                // check for slashes in variable name
-                var newname = name.replace(new RegExp(/\/|\\/g), '_');
+                let current = meta[name];
+
+                let key = ssgCoreHelper.mdGetKey(current);
 
                 // create a new object property with normalized name
-                newDocData[newname] = {
-                    title: data[name].title,
+                newDocData[key] = {
+                    title: data[name].title !== undefined ? data[name].title : '',
                     body: data[name].body
                 }
 
@@ -120,7 +122,6 @@ gulp.task('doc:markdown', () => {
             stream: true
         }));
 });
-
 
 // Precompile handle bar templates
 gulp.task('ssg:precompile', ['ssg:config'], () => {
