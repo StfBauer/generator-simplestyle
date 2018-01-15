@@ -29,9 +29,15 @@ const ts = require('gulp-typescript'),
 <% } %>
 
 <% if (includeSASS) { %>
-/* SASS Linter */
+/* SASS Linter 
+    Hello World
+*/
 const sassLint = require('gulp-sass-lint');
-<% } %>
+
+<% } else {
+    includeSASS    
+} %>
+
 /* Style Linter */
 const gulpStylelint = require('gulp-stylelint');
 
@@ -180,7 +186,7 @@ gulp.task('ts:compile', ['ts:lint'], () => {
 
 <% 
     /* Begin of SASS */
-    if (includeTypeScript) { 
+    if (includeSASS) { 
 %>
 // SASS Linting
 gulp.task('sass:lint', () => {
@@ -232,7 +238,7 @@ gulp.task('clean', () => {
 });
 
 // Gulp serve task
-gulp.task('serve', ['ssg:precompile', 'sass:compile', 'doc:markdown'], () => {
+gulp.task('serve', ['ssg:precompile', 'sass:compile', 'doc:markdown', 'ts:compile'], () => {
 
     // start browser sync
     browserSync(config.server);
@@ -289,7 +295,7 @@ gulp.task('build', ['clean', 'html:dist', 'ssg:precompile', 'sass:compile', 'doc
 });
 
 // Server from distribution folder
-gulp.task('serve:dist', ['dist'], () => {
+gulp.task('serve:dist', ['build'], () => {
     browserSync.init({
         notify: false,
         port: 9000,

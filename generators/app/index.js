@@ -70,13 +70,18 @@ module.exports = class extends Generator {
                 message: 'Which additional features would you like to include?',
                 choices: [{
                         name: 'Sass',
-                        value: 'includeSass',
+                        value: 'includeSASS',
                         checked: true
                     },
                     {
                         name: 'TypeScript',
                         value: 'includeTypeScript',
                         checked: true
+                    },
+                    {
+                        name: 'jQuery',
+                        value: 'includeJQuery',
+                        checked: false
                     }
                 ]
             }
@@ -92,8 +97,10 @@ module.exports = class extends Generator {
             const features = answers.features;
 
             const hasFeature = feat => features && features.indexOf(feat) !== -1;
-            this.includeSASS = hasFeature('includeSass');
+
+            this.includeSASS = hasFeature('includeSASS');
             this.includeTypeScript = hasFeature('includeTypeScript');
+            this.includeJQuery = hasFeature('includejQuery');
 
         })
     }
@@ -132,7 +139,7 @@ module.exports = class extends Generator {
                 date: (new Date).toISOString().split('T')[0],
                 name: this.pkg.name,
                 version: this.pkg.version,
-                includeSASS: this.includeSass,
+                includeSASS: this.includeSASS,
                 includeTypeScript: this.includeTypeScript
             }
         );
@@ -148,7 +155,8 @@ module.exports = class extends Generator {
                 name: this.name,
                 version: this.pkg.version,
                 includeSASS: this.includeSASS,
-                includeTypeScript: this.includeTypeScript
+                includeTypeScript: this.includeTypeScript,
+                includeJQuery: this.includeJQuery
             });
     }
     /**
@@ -252,6 +260,7 @@ module.exports = class extends Generator {
         mkdirp('app/_documentation');
         mkdirp('app/_config');
         mkdirp('app/_patterns');
+        mkdirp('app/_data');
 
     }
 
@@ -261,45 +270,56 @@ module.exports = class extends Generator {
     _addSampleData() {
         // Copy add atoms
         this.fs.copy(
-            this.templatePath('01-atom.hbs'),
+            this.templatePath('sample/hbs/01-atom.hbs'),
             this.destinationPath('app/_patterns/atoms/01-atom.hbs')
         );
         // Copy add molecule
         this.fs.copy(
-            this.templatePath('01-molecule.hbs'),
+            this.templatePath('sample/hbs/01-molecule.hbs'),
             this.destinationPath('app/_patterns/molecules/01-molecule.hbs')
+        );
+        // Copy add template
+        this.fs.copy(
+            this.templatePath('sample/hbs/01-template.hbs'),
+            this.destinationPath('app/_patterns/templates/01-template.hbs')
         );
         // Copy add organism
         this.fs.copy(
-            this.templatePath('01-organism.hbs'),
-            this.destinationPath('app/_patterns/organisms/01-organism.hbs')
+            this.templatePath('sample/hbs/01-organism.hbs'),
+            this.destinationPath('app/_patterns/organism/01-organism.hbs')
         );
         // Copy add page
         this.fs.copy(
-            this.templatePath('01-page.hbs'),
+            this.templatePath('sample/hbs/01-page.hbs'),
             this.destinationPath('app/_patterns/pages/01-page.hbs')
         );
 
 
         // Copy add atom documentation
         this.fs.copy(
-            this.templatePath('01-atom.md'),
+            this.templatePath('sample/md/01-atom.md'),
             this.destinationPath('app/_documentation/atoms/01-atom.md')
         );
         // Copy add molecule documentation
         this.fs.copy(
-            this.templatePath('01-molecule.md'),
+            this.templatePath('sample/md/01-molecule.md'),
             this.destinationPath('app/_documentation/molecules/01-molecule.md')
         );
         // Copy add organism documentation
         this.fs.copy(
-            this.templatePath('01-organism.md'),
-            this.destinationPath('app/_documentation/organisms/01-organism.md')
+            this.templatePath('sample/md/01-organism.md'),
+            this.destinationPath('app/_documentation/organism/01-organism.md')
         );
         // Copy add page documentation
         this.fs.copy(
-            this.templatePath('01-page.md'),
+            this.templatePath('sample/md/01-page.md'),
             this.destinationPath('app/_documentation/pages/01-page.md')
+        );
+
+        // Copy sample js
+        this.fs.copy(
+            this.templatePath('sample/data/ssg.data.js'),
+            this.destinationPath('app/_data/ssg.data.js')
         );
 
     }

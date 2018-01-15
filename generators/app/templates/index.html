@@ -77,25 +77,30 @@
     </div>
 
     <!-- Core Scripts -->
-    <!-- build:js scripts/vendor.js -->
+    <!-- build:js scripts/vendor.core.js -->
     <script src="/es6-promise/dist/es6-promise.js"></script>
-    <script src="/es6-promise/dist/es6-promise.auto.js"></script>
+    <!-- <script src="/es6-promise/dist/es6-promise.auto.js"></script> -->
     <script src="/handlebars/dist/handlebars.js"></script>
     <script src="/prismjs/prism.js"></script>
     <script src="/prismjs/plugins/autoloader/prism-autoloader.js"></script>
     <!-- endbuild -->
+    <!-- build:js scripts/vendor.js -->
+    <script src="/jquery/dist/jquery.min.js"></script>
+    <!-- endbuild -->
     <!-- <script src="/scripts/ssgCore.templates.js"></script> -->
+    <!-- build:js scripts/ssg.core.js -->
     <script src="/scripts/ssg.templates.js"></script>
     <script src="/scripts/ssg.ui.js"></script>
+    <!-- endbuild -->
     <script type="text/javascript">
       Prism.plugins.autoloader.languages_path = '/prismjs/components/';
     </script>
+
     <!-- // Core Scripts -->
     <!-- Documentation
     <script src="/_documentation/ssg.doc.js"></script> -->
     <!-- // Documentation -->
     <script src="/scripts/main.js"></script>
-    <script src="/scripts/moses.js"></script>
 </body>
 
 </html>
