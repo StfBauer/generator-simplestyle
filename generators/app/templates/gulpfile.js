@@ -1,73 +1,217 @@
-var gulp = require('gulp'),
+// generated on <%= date %> using <%= name %> <%= version %>
+/* GULP Configuration */
+/* Coree engine */
+const gulp = require('gulp'),
     $ = require('gulp-load-plugins')({
         lazy: true
     }),
+    gulpif = require('gulp-if'),
+    markdown = require('gulp-marked-json'),
+    jsoncombine = require('gulp-jsoncombine'),
+    del = require('del');
 
-    // base application configuration
-    del = require('del'),
-    wiredep = require('wiredep').stream,
-    browserSync = require('browser-sync'),
-    args = require('yargs').argv,
-    chalk = require('chalk'),
+/* Core Simple Style Guide engine */
+const ssgCore = require('./ssg-core-engine/ssg.core.precompile'),
+    ssgCoreConfig = require('./ssg-core-engine/ssg.core.genConfig'),
+    ssgCoreHelper = require('./ssg-core-engine/ssg.core.helpers');
 
-    // custom plugins for simple style guide
-    helper = require('./libs/helper'),
-    config = require('./gulp.config'),
-    ssgCoreConfig = require('./libs/gen-config'),
-    ssgCoreCompile = require('./libs/precomp-pattern');
+/* Browser Sync */
+const browserSync = require('browser-sync'),
+    reload = browserSync.reload;
 
-// Contants
-var reload = browserSync.reload;
+/* Configurations */
+const config = require('./ssg.core.config');
 
-/////////// Reused functions
-// check javascript styling conventions
-var checkJSStyle = function(files) {
+<% if (includeTypeScript) { %>
+/* Type Script */
+const ts = require('gulp-typescript'),
+    tslint = require('gulp-tslint');
+<% } %>
 
-    if (files === undefined || files === null) {
-        log.Error('Files is not defined');
-        return;
-    }
+<% if (includeSASS) { %>
+/* SASS Linter 
+    Hello World
+*/
+const sassLint = require('gulp-sass-lint');
+<% } else {
+    includeSASS    
+} %>
 
-    // pass correct file array in
-    gulp.src(files)
-        .pipe($.plumber())
-        .pipe($.if(args.verbose, $.print()))
-        // .pipe($.jscs())
-        .pipe($.jshint())
-        .pipe($.jshint.reporter('jshint-stylish'), {
-            verbose: true
-        });
+/* Style Linter */
+const gulpStylelint = require('gulp-stylelint');
+
+// watchs on file system
+let watches = () => {
+
+    // watch all style changes in app/styles
+    gulp.watch(config.watches.styles, ['sass:compile'], reload);
+
+<% 
+if(includeTypeScript){ %>
+    // watch for all typescript files in app/scripts
+    gulp.watch(config.watches.scriptsTS, ['ts:compile'], reload);
+<%  
+}
+
+if(!includeTypeScript || includeJQuery){ %>
+    // watch for all typescript files in app/scripts
+    gulp.watch(config.watches.scriptsJS, reload);<% 
+}
+%> 
+    // Update configuration
+    gulp.watch(config.watches.ssg)
+        // item was changed
+        .on('change', ssgCoreConfig.fsEvents);
+
+    // Precompile all patterns
+    gulp.watch(config.watches.ssg, ['ssg:precompile'], reload);
+
+    // Watch for documentation changes
+    gulp.watch(config.watches.documentation, ['doc:markdown'], reload);
+
+    // Watch for configuration changes
+    gulp.watch(config.watches.staticFiles)
+        .on('change', reload);
+
+    // waht everything else
+    gulp.watch([
+        'app/images/**/*',
+        '.tmp/fonts/**/*'
+    ]).on('change', reload);
+
 };
 
-// Used for inject
-var inject = function(options) {
+// Generate index file for all pattern
+gulp.task('ssg:config', () => {
 
-    // pages to inject files
-    var target = gulp.src(config.landingPages);
+    // Get pattern path
+    var patternPath = config.ssg.path;
 
-    // source that needs to be injected
-    var sources = gulp.src(options.source, {
-        read: false
-    });
+    var curConfig = {
+        patterns: patternPath,
+        configFile: config.ssg.config
+    };
 
-    return target
-        .pipe($.plumber())
-        .pipe($.inject(sources, {
-            ignorePath: '.tmp'
+    // parse configuration and log
+    gulp.src(patternPath)
+        .pipe(ssgCoreConfig
+            .createConfig(curConfig));
+
+});
+
+// Generate Dockumentation
+gulp.task('doc:markdown', () => {
+
+    return gulp.src(config.watches.documentation)
+        .pipe(markdown({
+            pedantic: true,
+            smartypants: true
         }))
-        .pipe(gulp.dest(config.basepath));
-};
+        .pipe(jsoncombine(config.documentation.path, function (data, meta) {
 
-// compile styles and use path
-var compileStyles = function(config) {
+            var keys = [],
+                name,
+                newDocData = {};
 
-    // base remove all except sub folder
-    var cssPath = '';
+            for (name in meta) {
 
-    return gulp.src(config.src, {
-            base: config.base
-        })
-        .pipe($.plumber())
+                let current = meta[name];
+
+                let key = ssgCoreHelper.mdGetKey(current);
+
+                // create a new object property with normalized name
+                newDocData[key] = {
+                    title: data[name].title !== undefined ? data[name].title : '',
+                    body: data[name].body
+                }
+
+            }
+
+            // return new buffer in wrapped table
+            return new Buffer("var ssgDoc = " + JSON.stringify(newDocData));
+
+        }))
+        .pipe(gulp.dest('.tmp/'))
+        .pipe(reload({
+            stream: true
+        }));
+});
+
+// Precompile handle bar templates
+gulp.task('ssg:precompile', ['ssg:config'], () => {
+    return ssgCore(config.ssg);
+});
+
+<% 
+    /* Begin of TypeScript */
+    if (includeTypeScript) { 
+%>
+// Typescript Linting
+gulp.task('ts:lint', () => {
+
+    return gulp.src(config.watches.scriptsTS)
+        .pipe(
+            $.plumber()
+        )
+        .pipe(
+            tslint({
+                configuration: "tslint.json",
+                formatter: "stylish"
+            })
+        )
+        .pipe(tslint.report({
+            emitError: false
+        }));
+    // .pipe(
+    //     gulp.dest('app/scripts')
+    // );
+});
+
+// General typescript compilation
+gulp.task('ts:compile', ['ts:lint'], () => {
+
+    var tsProject = ts.createProject(config.tsconfig);
+
+    return gulp.src(config.watches.scriptsTS)
+        .pipe(
+            $.plumber()
+        )
+        .pipe(
+            ts(config.tsconfig)
+        )
+        .pipe(
+            gulp.dest(config.target.scripts)
+        )
+        .pipe(reload({
+            stream: true
+        }));
+
+});
+<%
+    /* End of TypeScript */
+    }
+%>
+
+<% 
+    /* Begin of SASS */
+    if (includeSASS) { 
+%>
+// SASS Linting
+gulp.task('sass:lint', () => {
+
+    var watches = config.watches.styles;
+
+    return gulp.src(watches)
+        .pipe(sassLint())
+        .pipe(sassLint.format());
+
+});
+// SASS compilation
+gulp.task('sass:compile', ['sass:lint'], () => {
+
+    var watches = config.watches.styles;
+
+    return gulp.src(watches)
         .pipe($.sourcemaps.init())
         .pipe($.sass.sync({
             outputStyle: 'expanded',
@@ -75,231 +219,112 @@ var compileStyles = function(config) {
             includePaths: ['.']
         }).on('error', $.sass.logError))
         .pipe($.autoprefixer({
-            browsers: ['last 1 version']
+            browsers: ['> 1%', 'last 2 versions', 'Firefox ESR']
         }))
         .pipe($.sourcemaps.write())
-        .pipe($.rename({
-            dirname: cssPath
+        .pipe(gulp.dest(config.target.styles))
+        .pipe(gulpStylelint({
+            reporters: [{
+                formatter: 'string',
+                console: true
+            }]
         }))
-        .pipe(gulp.dest('.tmp/styles'))
-        .pipe(browserSync.stream());
-
-};
-// Gulp taks
-var log = {
-    Msg: function(msg) {
-        helper.logMessage(msg, helper.logType.info);
-    },
-    Error: function(msg) {
-        helper().logMessage(msg, helper.logType.error);
-    },
-    Warn: function(msg) {
-        helper().logMessage(msg, helper.logType.warning);
-    }
-};
-
-/// Cleaning up tmp folder
-// Clean forlder strucuture and temp folders
-gulp.task('clean', function(done) {
-
-    var files2delete = config.tempFiles + '*';
-
-    del(config.tempFiles).then(function() {
-        return done();
-    });
-
-});
-
-///// Style Configuration
-// Styles Sheet compilation
-gulp.task('styles', function() {
-
-    var baseStyleOptions = {
-        src: 'app/styles/**/*.scss',
-        base: './app/styles/'
-    };
-
-    // piping through sass
-    return compileStyles(baseStyleOptions);
-
-});
-
-// Styles Sheet compilation
-gulp.task('styles:core', function() {
-
-    var baseStyleOptions = {
-        src: 'app/_core/styles/*.scss',
-        base: './app/_core/styles/',
-    };
-
-    // piping through sass
-    return compileStyles(baseStyleOptions);
-
-});
-///// Style Configuration End
-
-// Generate index file for all pattern
-gulp.task('gen:config', function() {
-
-    // var patternPath = config.patterns[0];
-    var patternPath = './app/_patterns/**/*.hbs';
-
-    var curConfig = {
-        patterns: patternPath,
-        configFile: config.patternConfig
-    };
-
-    // parse configuration and log
-    gulp.src(patternPath)
-        .pipe(ssgCoreConfig.createConfig(curConfig));
-
-});
-
-// Precompile handle bar templates
-gulp.task('precompile:ssg', function() {
-
-    return ssgCoreCompile(config.ssg);
-
-});
-
-// Precompile core templates
-gulp.task('precompile:core', function() {
-
-    return ssgCoreCompile(config.core);
-
-});
-
-gulp.task('test', function() {
-
-    ssgCoreConfig.handleDelete();
-
-});
-
-gulp.task('ssgCore-update', function() {
-
-    return gulp.src('app/_core/**/*.js')
-        .pipe($.sourcemaps.init())
-        .pipe($.concat('ssgCoreLib.js'))
-        .pipe($.wrap('var jQuery = jQuery.noConflict();\n(function($){\n\'use strict\';\n&lt;%= contents %&gt;\n})(jQuery);'))
-        .pipe($.sourcemaps.write('./', {
-            includeContent: false,
-            sourceRoot: '/_core/'
-        }))
-        .pipe(gulp.dest('.tmp/scripts'))
-        .pipe(browserSync.stream({
-            match: '**/*.js'
+        .pipe(reload({
+            stream: true
         }));
 
 });
+<% 
+    /* END of SASS */
+    } 
+%>
 
-// Wire up dependencies
-gulp.task('wiredep', function() {
 
-    var options = config.getWiredepDefaultOptions();
+// cleans everythign up
+gulp.task('clean', () => {
+    return del.sync('dist');
+});
 
-    gulp.src('app/styles/main.scss')
-        .pipe($.plumber())
-        .pipe($.print())
-        .pipe(wiredep({
-            ignorePath: /^(\.\.\/)+/
-        }))
-        .pipe(gulp.dest('app/styles'));
+// Gulp serve task
+gulp.task('serve', ["ssg:precompile", "doc:markdown"<%
+    if(includeSASS){
+        %>, "sass:compile"<%
+    }
+    if(includeTypeScript){
+        %>, 'ts:compile'<%
+    }
+%>], () => {
 
-    gulp.src('app/*.html')
-        .pipe($.plumber())
-        .pipe($.print())
-        .pipe(wiredep({
-            ignorePath: /^(\.\.\/)*\.\./,
-            devDependencies: true
-        }))
-        .pipe(gulp.dest('app'));
+    // start browser sync
+    browserSync(config.server);
+
+    // init all watches
+    watches();
 
 });
 
-// inject javascript into file
-gulp.task('inject:scripts', function() {
+gulp.task('html:dist', () => {
 
-    var options = {
-        source: [config.tempFiles + '**/*.js'],
-    };
+    /**
+     * Bundle prismJS Syntax highlighting
+     */
+    gulp.src('node_modules/prismjs/components/*.min.js')
+        .pipe(gulp.dest('dist/prismjs/components'));
+    /**
+     * merge files together
+     */
 
-    return inject(options);
-
-});
-
-gulp.task('inject:styles', function() {
-
-    var options = {
-        source: [config.js],
-    };
-
-    helper.log('Inject Style Sheets', helper.logType.info);
-
-    return inject(options);
-
-});
-
-gulp.task('vet', function() {
-
-    log.Msg('Analyzing source :: Style Guide Mode');
-
-    gulp.watch(config.devjs)
-        .on('change', function() {
-            checkJSStyle(config.js);
-        });
+    return gulp.src('app/*.html')
+        .pipe(
+            $.useref({
+                searchPath: ['', 'node_modules', 'ssg-core-engine', '.tmp', 'ssg-core/ui']
+            })
+        )
+        // .pipe(gulpif('*.js', $.minify()))
+        .pipe(gulp.dest('dist'));
 
 });
 
-gulp.task('vet-dev', function() {
+// Gulp serve task
+gulp.task('build', ['clean', 'html:dist', 'ssg:precompile', 'sass:compile', 'doc:markdown'], () => {
 
-    log.Msg('Analyzing source :: Dev Mode');
-    console.log(config.devjs);
-    gulp.watch(config.devjs)
-        .on('change', function() {
-            checkJSStyle(config.devjs);
-        });
+    gulp.src([
+            './.tmp/**/*'
+        ])
+        .pipe(
+            gulp.dest('dist')
+        );
+
+    gulp.src([
+            './app/_config/*',
+        ])
+        .pipe(
+            gulp.dest('dist/_config')
+        );
+
+    gulp.src([
+            './app/_data/*',
+        ])
+        .pipe(
+            gulp.dest('dist/_data')
+        );
+
+    gulp.src([
+            './ssg-core/ui/**/*',
+        ])
+        .pipe(
+            gulp.dest('dist/')
+        );
 
 });
 
-// compile handlebar patterns
-gulp.task('serve', ['ssgCore-update', 'styles', 'styles:core', 'precompile:core', 'precompile:ssg', 'vet'], function() {
-
-    gulp.watch('app/_patterns/**/*.hbs', function(event) {
-
-        ssgCoreConfig.fsEvents(event, config);
-
-    });
-
-    // Recompile pattern
-    gulp.watch([
-        'app/*.html',
-        'app/scripts/**/*.js',
-        'app/images/**/*'
-    ]).on('change', reload);
-
-    gulp.watch(['app/_config/*.json'], ['precompile:ssg'], reload);
-
-    // gulp.watch('app/_core/**/*.js', ['ssgCore-update'], reload);
-
-    // gulp.watch('app/_core/styles/*.scss', ['styles:core'], reload);
-    gulp.watch('./app/styles/**/*.scss', ['styles'], reload);
-
-    browserSync({
+// Server from distribution folder
+gulp.task('serve:dist', ['build'], () => {
+    browserSync.init({
         notify: false,
         port: 9000,
         server: {
-            baseDir: ['libs', '.tmp', 'app'],
-            middleware: function (req, res, next) {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                next();
-            },
-            routes: {
-                '/bower_components': 'bower_components',
-                '/tmp': '/',
-                '/lib': '/'
-            }
-        },
-        https: true
+            baseDir: ['dist']
+        }
     });
-
 });
