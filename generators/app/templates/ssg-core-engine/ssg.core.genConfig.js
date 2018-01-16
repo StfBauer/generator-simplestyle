@@ -13,6 +13,16 @@ var gulp = require('gulp'),
 
 var reload = browserSync.reload;
 
+// filepath
+var normalizeFilePath = function(filepath) {
+    if (filepath.indexOf('\\') !== -1) {
+        filepath = filepath.replace(new RegExp('\\\\', 'g'), '/');
+        filepath = filepath.replace(new RegExp('//', 'g'), '/');
+    }
+
+    return filepath;
+}
+
 module.exports = {
 
     createConfig: function(options) {
@@ -24,13 +34,15 @@ module.exports = {
 
         var handleDuplicates = function(data) {
 
+            var file = normalizeFilePath(data.filepath);
+
             var found = patternsData.filter(function(obj) {
 
-                return obj.filepath === data.filepath;
+                return obj.filepath === file;
 
             });
 
-            var filepath = data.filepath.split('/')[0];
+            var filepath = file.split('/')[0];
 
             if (found.length === 0) {
 
@@ -41,7 +53,6 @@ module.exports = {
         };
 
         var updateConfig = function(event) {
-            log('Update Config:::');
             if (event.type === 'deleted') {
                 log(event.path);
             }
@@ -53,11 +64,13 @@ module.exports = {
 
             var path = require('path');
 
+            filePath = normalizeFilePath(file.relative);
+
             // init pattern configs
-            var filename = path.basename(file.relative),
-                extension = path.extname(file.relative),
+            var filename = path.basename(filePath),
+                extension = path.extname(filePath),
                 basename = filename.replace(extension, ''),
-                patternpath = path.dirname(file.relative),
+                patternpath = path.dirname(filePath),
                 title = basename.indexOf('_') === 0 ? basename.substr(1) : basename;
 
             // create pattern object
@@ -65,7 +78,7 @@ module.exports = {
                 title: title,
                 description: '',
                 filename: basename,
-                filepath: file.relative
+                filepath: filePath
             };
 
             this.push(data);
@@ -162,8 +175,9 @@ module.exports = {
             try {
 
                 // Loading old configuration
-                var config = fs.readFileSync(options.configFile);
-
+                var config = fs.readFileSync(options.configFile, "utf8");
+                
+                if(config !== ""){
                 // parse json config
                 var configData = JSON.parse(config);
 
@@ -171,8 +185,6 @@ module.exports = {
                 patternsData = configData !== undefined &&
                     configData.patterns !== undefined ? configData.patterns : [];
 
-                // Pattern Data
-                // log(patternsData);
 
                 log(
                     'Found',
@@ -180,6 +192,7 @@ module.exports = {
                     'pattern(s) in current configuration.');
 
                 statistics = patternsData.length;
+            }
 
             } catch (err) {
 
@@ -237,7 +250,7 @@ module.exports = {
 
         // renames files in pattern config
         var renamePattern = function(files) {
-            log('Rename Item:::');
+            
         };
 
         var trimExtension = function(file) {
@@ -325,8 +338,6 @@ module.exports = {
 
         var renamePatternItem = function(files) {
 
-            log('Rename Pattern Item:::');
-
             var curConfig = patternConfig.patterns,
                 // Old file
                 oldFile = path.basename(files.old),
@@ -362,8 +373,6 @@ module.exports = {
 
         var deletePatternItem = function(file) {
 
-            log('Delete Pattern Item:::');
-
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
                 relPath = normalizeFilePath(path.relative(appPath, file)),
@@ -391,7 +400,7 @@ module.exports = {
             Handle all file events
         */
         var added = function(file) {
-            log('File added');
+
             try {
                 createPatternItem(file);
             } catch (Exception) {
@@ -401,7 +410,7 @@ module.exports = {
 
         // pattern rename handler
         var renamed = function(files) {
-            log('File rename');
+
             try {
                 renamePatternItem(files);
             } catch (Exception) {
@@ -411,7 +420,7 @@ module.exports = {
 
         // pattern delete handler
         var deleted = function(file) {
-            log('File delete');
+
             try {
                 deletePatternItem(file);
             } catch (Exception) {
@@ -421,8 +430,6 @@ module.exports = {
 
         // pattern change handler
         var changed = function(file) {
-
-            log('Rename Pattern Item:::');
 
             var filename = path.basename(file),
                 filenameNoExt = trimExtension(filename),
@@ -449,46 +456,27 @@ module.exports = {
 
         };
 
-        // filepath
-        var normalizeFilePath = function(filepath) {
-            if (filepath.indexOf('\\') !== -1) {
-                filepath = filepath.replace(new RegExp('\\\\', 'g'), '/');
-                filepath = filepath.replace(new RegExp('//', 'g'), '/');
-            }
-
-            return filepath;
-        }
-
-
-        log("Current Page ::: ", event.path);
         // Check if path exists just in case 
         if (fs.existsSync(event.path)) {
             // Getting file stats
             var file = fs.statSync(event.path);
 
             if(file.isDirectory()){
-                log('Directory added');
                 return;
             }
         }
 
-        log('EVENT TYPE ::: ', event.type);
-
         switch (event.type) {
             case 'added':
-                log('ADDED Pattern Item:::');
                 added(event.path);
                 break;
             case 'changed':
-                log('CHANGED Pattern Item:::');
                 changed(event.path);
                 break;
             case 'deleted':
-                log('DELETED Pattern Item:::');
                 deleted(event.path);
                 break;
             case 'renamed':
-                log('RENAMED Pattern Item:::');
                 renamed(event);
                 break;
         }
