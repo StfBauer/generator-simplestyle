@@ -98,9 +98,11 @@ module.exports = class extends Generator {
 
             const hasFeature = feat => features && features.indexOf(feat) !== -1;
 
+            console.log('HAS FEATURES:   ', hasFeature('includejQuery'), features);
+
             this.includeSASS = hasFeature('includeSASS');
             this.includeTypeScript = hasFeature('includeTypeScript');
-            this.includeJQuery = hasFeature('includejQuery');
+            this.includeJQuery = hasFeature('includeJQuery');
 
         })
     }
@@ -110,7 +112,7 @@ module.exports = class extends Generator {
         this._writeGulpFile();
         this._writePackageJSON();
         this._writeGit();
-        this._writeTypeScriptConfig();
+        this._writeEditorConfig();
         this._writeSSGEngine();
         this._writeSSGUI();
         this._writeSSGConfig();
@@ -125,6 +127,7 @@ module.exports = class extends Generator {
         console.log(this.name);
         console.log(this.includeSASS);
         console.log(this.includeTypeScript);
+        console.log(this.includeJQuery);
         console.log(this.useAtomic);
     }
 
@@ -140,7 +143,8 @@ module.exports = class extends Generator {
                 name: this.pkg.name,
                 version: this.pkg.version,
                 includeSASS: this.includeSASS,
-                includeTypeScript: this.includeTypeScript
+                includeTypeScript: this.includeTypeScript,
+                includeJQuery: this.includeJQuery
             }
         );
     }
@@ -240,9 +244,15 @@ module.exports = class extends Generator {
      * Save base configuration to project
      */
     _writeSSGConfig() {
-        this.fs.copy(
+        this.fs.copyTpl(
             this.templatePath('ssg.core.config.js'),
-            this.destinationPath('ssg.core.config.js')
+            this.destinationPath('ssg.core.config.js'), {
+                name: this.name,
+                version: this.pkg.version,
+                includeSASS: this.includeSASS,
+                includeTypeScript: this.includeTypeScript,
+                includeJQuery: this.includeJQuery
+            }
         )
     }
     /**
@@ -368,18 +378,21 @@ module.exports = class extends Generator {
     /**
      * Write TypeScript configuration
      */
-    _writeTypeScriptConfig() {
+    _writeEditorConfig() {
 
         var files = [
             'tsconfig.json',
             'tslint.json',
-            'typings.json'
+            'typings.json',
+            '.editorconfig'
         ]
 
         files.forEach(file => {
-            this.fs.copy(
-                this.templatePath('typescript/', file),
-                this.destinationPath(file)
+            this.fs.copyTpl(
+                this.templatePath('configs/', file),
+                this.destinationPath(file), {
+                    includeJQuery: this.includeJQuery
+                }
             );
         });
 
@@ -388,10 +401,16 @@ module.exports = class extends Generator {
      * Write HTML
      */
     _writeHtml() {
-        this.fs.copy(
+
+        console.log('JQUERY:   ', this.includeJQuery)
+
+        this.fs.copyTpl(
             this.templatePath('index.html'),
-            this.destinationPath('app/index.html')
+            this.destinationPath('app/index.html'), {
+                includeJQuery: this.includeJQuery
+            }
         );
+
     }
 
 

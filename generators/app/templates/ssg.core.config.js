@@ -43,8 +43,14 @@ module.exports = (() => {
         },
         watches: {
             styles: basepath + '/styles/**/*.scss',
-            scripts: basepath + '/scripts/**/*.ts',
-            // basepath + '/_patterns/**/[^_]*.hbs'
+            <% 
+            if(includeTypeScript){ 
+            /* TypeScript */
+            %>
+            scriptsTS: basepath + '/scripts/**/*.ts',
+            <% } 
+            /* jQuery and not Typescript */
+            %>scriptsJS: basepath + '/scripts/**/*.js',
             ssg: [
                 basepath + '/_patterns/**/[^_]*.hbs'
             ],

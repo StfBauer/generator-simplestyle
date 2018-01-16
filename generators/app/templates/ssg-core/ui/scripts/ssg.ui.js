@@ -1,3 +1,8 @@
+this["ssgCore"] = this["ssgCore"] || {};
+this["ssgCore"]["templates"] = this["ssgCore"]["templates"] || {};
+this["ssgCore"]["templates"]["addTools"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    return "<div id=\"ssg-add-tools\">\n</div>";
+},"useData":true});
 Handlebars.registerPartial("buttons",Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -9,11 +14,6 @@ Handlebars.registerPartial("buttons",Handlebars.template({"compiler":[7,">= 4.0.
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "</button>";
 },"useData":true}));
-this["ssgCore"] = this["ssgCore"] || {};
-this["ssgCore"]["templates"] = this["ssgCore"]["templates"] || {};
-this["ssgCore"]["templates"]["addTools"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<div id=\"ssg-add-tools\">\n</div>";
-},"useData":true});
 this["ssgCore"]["templates"]["itemselector"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -38,9 +38,9 @@ this["ssgCore"]["templates"]["patternItem"] = Handlebars.template({"compiler":[7
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "</div>\n		<div class=\"ssg-item-description\">\n			<div class=\"ssg-docs\">"
     + alias4(((helper = (helper = helpers.description || (depth0 != null ? depth0.description : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"description","hash":{},"data":data}) : helper)))
-    + "</div>\n		<b class=\"ssg-pattern-label\">Pattern name:</b><span class=\"ssg-pattern-name\">"
+    + "</div>\n			<b class=\"ssg-pattern-label\">Pattern name:</b>\n			<span class=\"ssg-pattern-name\">"
     + alias4(((helper = (helper = helpers.filename || (depth0 != null ? depth0.filename : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"filename","hash":{},"data":data}) : helper)))
-    + "</span></div>\n	</div>\n	<div class=\"sample\">"
+    + "</span>\n		</div>\n	</div>\n	<div class=\"sample\">"
     + ((stack1 = ((helper = (helper = helpers.sample || (depth0 != null ? depth0.sample : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sample","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "</div>\n	<pre class=\"ssg-item-code\"><code class='language-markup'>"
     + alias4(((helper = (helper = helpers.sample || (depth0 != null ? depth0.sample : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"sample","hash":{},"data":data}) : helper)))
@@ -374,6 +374,16 @@ var ssg;
                         default:
                             vpTarget.style.width = vpData;
                             break;
+                    }
+                    // assign special class for documentation
+                    var vpCurSize = parseInt(vpData, 10);
+                    if (vpCurSize !== NaN && vpCurSize <= 1024) {
+                        console.log('small view port size');
+                        vpTarget.classList.add('vp-small');
+                    }
+                    else {
+                        console.log('large view port size');
+                        vpTarget.classList.remove('vp-small');
                     }
                 }
                 if (vpData !== 'disco') {
@@ -874,6 +884,17 @@ var ssg;
 })(ssg || (ssg = {}));
 ;
 ssg.UI.Init();
+Handlebars.registerHelper('description', function (block) {
+    var description = '', markdownKey = block.data.root.baseFilter + '_' + block.data.root.title;
+    if (ssgDoc[markdownKey] !== undefined) {
+        description = ssgDoc[markdownKey].body;
+        return new Handlebars.SafeString(description);
+    }
+    else {
+        // description = block.data.root.description;
+        return block.data.root.description;
+    }
+});
 
 Handlebars.registerHelper('description', function (block) {
     var description = "", markdownKey = block.data.root.baseFilter + '_' + block.data.root.title;

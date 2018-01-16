@@ -4,13 +4,26 @@
   <title>
 
   </title>
+
   <!-- build:css styles/vendor.css -->
+  <!-- PRISMJS: The folloing line handle the syntax highlighter color theme
+    possible values: prism, prism-coy, prism-dark, prism-funky, prism-okaidia, prism-solarizedlight, prism-tomorrow
+  -->
   <link rel="stylesheet" href="/prismjs/themes/prism-okaidia.css" type="text/css">
-  <!-- endbuild -->
+  <!-- /PRISMJS -->
   <link rel="stylesheet" href="/styles/ssg.core.css" type="text/css">
+  <!-- endbuild -->
+
+  <!-- build:css styles/main.css -->
   <link rel="stylesheet" href="/styles/main.css" type="text/css">
+  <!-- endbuild -->
+
+  <!-- Documentation and Data -->
+  <!-- build:js scripts/ssg.data.js -->
   <script src="/scripts/ssg.doc.js"></script>
   <script src="/_data/ssg.data.js"></script>
+  <!-- endbuild -->
+  <!-- // Documentation and Data -->
 </head>
 
 <body>
@@ -65,11 +78,11 @@
     <div id="ssg-docbar" class="ssg-docbar">
       <div id="ssg-docbar-actions">
         <button class="ssg-button">
-                &lt;
-            </button>
+          &lt;
+        </button>
         <button class="ssg-button">
-                &gt;
-            </button>
+          &gt;
+        </button>
       </div>
       <div id="ssg-docbar-inner">
 
@@ -77,30 +90,36 @@
     </div>
 
     <!-- Core Scripts -->
+
     <!-- build:js scripts/vendor.core.js -->
-    <script src="/es6-promise/dist/es6-promise.js"></script>
-    <!-- <script src="/es6-promise/dist/es6-promise.auto.js"></script> -->
+    <script src="/es6-promise/dist/es6-promise.min.js"></script>
     <script src="/handlebars/dist/handlebars.js"></script>
     <script src="/prismjs/prism.js"></script>
     <script src="/prismjs/plugins/autoloader/prism-autoloader.js"></script>
     <!-- endbuild -->
-    <!-- build:js scripts/vendor.js -->
-    <script src="/jquery/dist/jquery.min.js"></script>
-    <!-- endbuild -->
-    <!-- <script src="/scripts/ssgCore.templates.js"></script> -->
-    <!-- build:js scripts/ssg.core.js -->
-    <script src="/scripts/ssg.templates.js"></script>
-    <script src="/scripts/ssg.ui.js"></script>
-    <!-- endbuild -->
-    <script type="text/javascript">
-      Prism.plugins.autoloader.languages_path = '/prismjs/components/';
-    </script>
 
-    <!-- // Core Scripts -->
-    <!-- Documentation
-    <script src="/_documentation/ssg.doc.js"></script> -->
-    <!-- // Documentation -->
-    <script src="/scripts/main.js"></script>
+    <!-- build:js scripts/vendor.js -->
+    <% if(includeJQuery) { %>
+      <!-- jQuery -->
+      <script src="/jquery/dist/jquery.min.js"></script>
+      <!-- /jQuery -->
+      <% } %>
+        <!-- endbuild -->
+
+        <!-- build:js scripts/ssg.core.js -->
+        <script src="/scripts/ssg.templates.js"></script>
+        <script src="/scripts/ssg.ui.js"></script>
+        <!-- endbuild -->
+
+        <!-- // Core Scripts -->
+        <!-- build:js scripts/main.js -->
+        <script src="/scripts/main.js"></script>
+        <!-- endbuild -->
+        <script type="text/javascript">
+          Prism.plugins.autoloader.languages_path = '/prismjs/components/';
+        </script>
+
+
 </body>
 
 </html>

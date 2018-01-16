@@ -33,7 +33,6 @@ const ts = require('gulp-typescript'),
     Hello World
 */
 const sassLint = require('gulp-sass-lint');
-
 <% } else {
     includeSASS    
 } %>
@@ -47,9 +46,18 @@ let watches = () => {
     // watch all style changes in app/styles
     gulp.watch(config.watches.styles, ['sass:compile'], reload);
 
+<% 
+if(includeTypeScript){ %>
     // watch for all typescript files in app/scripts
-    gulp.watch(config.watches.scripts, ['ts:compile'], reload);
+    gulp.watch(config.watches.scriptsTS, ['ts:compile'], reload);
+<%  
+}
 
+if(!includeTypeScript || includeJQuery){ %>
+    // watch for all typescript files in app/scripts
+    gulp.watch(config.watches.scriptsJS, reload);<% 
+}
+%> 
     // Update configuration
     gulp.watch(config.watches.ssg)
         // item was changed
@@ -141,7 +149,7 @@ gulp.task('ssg:precompile', ['ssg:config'], () => {
 // Typescript Linting
 gulp.task('ts:lint', () => {
 
-    return gulp.src(config.watches.scripts)
+    return gulp.src(config.watches.scriptsTS)
         .pipe(
             $.plumber()
         )
@@ -164,7 +172,7 @@ gulp.task('ts:compile', ['ts:lint'], () => {
 
     var tsProject = ts.createProject(config.tsconfig);
 
-    return gulp.src(config.watches.scripts)
+    return gulp.src(config.watches.scriptsTS)
         .pipe(
             $.plumber()
         )
@@ -238,7 +246,14 @@ gulp.task('clean', () => {
 });
 
 // Gulp serve task
-gulp.task('serve', ['ssg:precompile', 'sass:compile', 'doc:markdown', 'ts:compile'], () => {
+gulp.task('serve', ["ssg:precompile", "doc:markdown"<%
+    if(includeSASS){
+        %>, "sass:compile"<%
+    }
+    if(includeTypeScript){
+        %>, 'ts:compile'<%
+    }
+%>], () => {
 
     // start browser sync
     browserSync(config.server);
@@ -250,10 +265,19 @@ gulp.task('serve', ['ssg:precompile', 'sass:compile', 'doc:markdown', 'ts:compil
 
 gulp.task('html:dist', () => {
 
+    /**
+     * Bundle prismJS Syntax highlighting
+     */
+    gulp.src('node_modules/prismjs/components/*.min.js')
+        .pipe(gulp.dest('dist/prismjs/components'));
+    /**
+     * merge files together
+     */
+
     return gulp.src('app/*.html')
         .pipe(
             $.useref({
-                searchPath: ['.', 'node_modules']
+                searchPath: ['', 'node_modules', 'ssg-core-engine', '.tmp', 'ssg-core/ui']
             })
         )
         // .pipe(gulpif('*.js', $.minify()))
