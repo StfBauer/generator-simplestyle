@@ -14,7 +14,7 @@ This yeoman generator allows you to create a Style Guide for your SharePoint and
 ## Installation
 
 
-`npm install -g generator-simplestyle bower gulp jslint`
+`npm install -g generator-simplestyle`
 
 After you installed the yeoman generator you are able to create new style guide instances.
 
