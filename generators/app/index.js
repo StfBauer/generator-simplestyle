@@ -322,6 +322,11 @@ module.exports = class extends Generator {
         );
         // Copy add page documentation
         this.fs.copy(
+            this.templatePath('sample/md/01-template.md'),
+            this.destinationPath('app/_documentation/templates/01-template.md')
+        );
+        // Copy add page documentation
+        this.fs.copy(
             this.templatePath('sample/md/01-page.md'),
             this.destinationPath('app/_documentation/pages/01-page.md')
         );
