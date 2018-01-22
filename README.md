@@ -68,11 +68,11 @@ In ever pattern the title and description property can be change manually to a p
 Filename and file path will be used to find the pattern corresponding with the file.
 
 ## Documentation
-[Create first SimpleStyle project](https://github.com/StfBauer/generator-simplestyle/wiki/Create-first-SimpleStyle-project)
-[Working with patterns](https://github.com/StfBauer/generator-simplestyle/wiki/Working-with-patterns)
-[Create advanced patterns](https://github.com/StfBauer/generator-simplestyle/wiki/Create-advanced-patterns)
-[Important Folders](https://github.com/StfBauer/generator-simplestyle/wiki/Important-Folders)
-[Data Binding with SimpleStyle](https://github.com/StfBauer/generator-simplestyle/wiki/Data-Binding-with-SimpleStyle)
+* [Create first SimpleStyle project](https://github.com/StfBauer/generator-simplestyle/wiki/Create-first-SimpleStyle-project)
+* [Working with patterns](https://github.com/StfBauer/generator-simplestyle/wiki/Working-with-patterns)
+* [Create advanced patterns](https://github.com/StfBauer/generator-simplestyle/wiki/Create-advanced-patterns)
+* [Important Folders](https://github.com/StfBauer/generator-simplestyle/wiki/Important-Folders)
+* [Data Binding with SimpleStyle](https://github.com/StfBauer/generator-simplestyle/wiki/Data-Binding-with-SimpleStyle)
 
 ## Credits
 Inspiration for this project came from [PatternLab.io](http://patternlab.io) and [Atomic Design](http://bradfrost.com/blog/post/atomic-web-design/) by Brad Frost.
