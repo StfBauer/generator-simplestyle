@@ -1,4 +1,4 @@
-# Documentation
+# Working with SimpleStyle
 To use Simply Style guide the following folders are mainly required during your development.
 ## ./app
 This folder contains all your source code configurations of the Simple Style Guide.
