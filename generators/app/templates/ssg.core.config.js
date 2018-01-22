@@ -17,8 +17,7 @@ module.exports = (() => {
                     '/node_modules': '/'
                 }
             },
-            https: true,
-            directory: true
+            https: true
         },
         tsconfig: 'tsconfig.json',
         ssgCoreTemp: './ssg-core-tmp',

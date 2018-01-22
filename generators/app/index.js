@@ -98,8 +98,6 @@ module.exports = class extends Generator {
 
             const hasFeature = feat => features && features.indexOf(feat) !== -1;
 
-            console.log('HAS FEATURES:   ', hasFeature('includejQuery'), features);
-
             this.includeSASS = hasFeature('includeSASS');
             this.includeTypeScript = hasFeature('includeTypeScript');
             this.includeJQuery = hasFeature('includeJQuery');
@@ -124,10 +122,10 @@ module.exports = class extends Generator {
     }
 
     _debug() {
-        console.log(this.name);
-        console.log(this.includeSASS);
-        console.log(this.includeTypeScript);
-        console.log(this.includeJQuery);
+        // console.log(this.name);
+        // console.log(this.includeSASS);
+        // console.log(this.includeTypeScript);
+        // console.log(this.includeJQuery);
         // console.log(this.useAtomic);
     }
 
@@ -407,8 +405,6 @@ module.exports = class extends Generator {
      */
     _writeHtml() {
 
-        console.log('JQUERY:   ', this.includeJQuery)
-
         this.fs.copyTpl(
             this.templatePath('index.html'),
             this.destinationPath('app/index.html'), {
@@ -428,6 +424,8 @@ module.exports = class extends Generator {
             skipMessage: this.options['skip-install-message'],
             skipInstall: this.options['skip-install']
         });
+        // install typings
+        this.spawnCommand('typings', ['install']);
     }
 
 }

@@ -1,5 +1,6 @@
-/** This is the first style sheet and this */
-a{
-    transition: all 1.6ms linear;
+/* This is the first style sheet and this */
+
+a {
     font-weight: bold;
+    transition: font-weight 1.6ms linear;
 }
