@@ -9,7 +9,11 @@ This yeoman generator allows you to create a Style Guide for your SharePoint and
 
 ## History
 
+<<<<<<< HEAD
 *Current Version:*   0.4.1
+=======
+*Current Version:*   0.4.0
+>>>>>>> fd866b1ca22a373aaa3be6bc28e05153b4887d56
 
 ## Installation
 
