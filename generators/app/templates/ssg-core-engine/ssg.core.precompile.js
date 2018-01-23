@@ -30,11 +30,17 @@ module.exports = function (patternConfig) {
             'Handlebars.template(<%= contents %>));', {}, {
                 imports: {
                     processPartialName: function (fileName) {
+                        
                         var patternName = path.basename(fileName, '.hbs');
 
                         if (patternName.indexOf("_") === 0) {
                             patternName = patternName.substr(1);
                         }
+
+                        if (patternName.endsWith('.js')){
+                            patternName = patternName.slice(0, -3);
+                        }
+
                         return JSON.stringify(patternName);
                     }
                 }
