@@ -28,15 +28,6 @@ const ts = require('gulp-typescript'),
     tslint = require('gulp-tslint');
 <% } %>
 
-<% if (includeSASS) { %>
-/* SASS Linter 
-    Hello World
-*/
-const sassLint = require('gulp-sass-lint');
-<% } else {
-    includeSASS    
-} %>
-
 /* Style Linter */
 const gulpStylelint = require('gulp-stylelint');
 
@@ -46,18 +37,19 @@ let watches = () => {
     // watch all style changes in app/styles
     gulp.watch(config.watches.styles, ['sass:compile'], reload);
 
-<% 
+    <% 
 if(includeTypeScript){ %>
     // watch for all typescript files in app/scripts
     gulp.watch(config.watches.scriptsTS, ['ts:compile'], reload);
-<%  
+    <%  
 }
 
 if(!includeTypeScript || includeJQuery){ %>
     // watch for all typescript files in app/scripts
-    gulp.watch(config.watches.scriptsJS, reload);<% 
+    gulp.watch(config.watches.scriptsJS, reload);
+    <% 
 }
-%> 
+%>
     // Update configuration
     gulp.watch(config.watches.ssg)
         // item was changed
@@ -196,18 +188,8 @@ gulp.task('ts:compile', ['ts:lint'], () => {
     /* Begin of SASS */
     if (includeSASS) { 
 %>
-// SASS Linting
-gulp.task('sass:lint', () => {
-
-    var watches = config.watches.styles;
-
-    return gulp.src(watches)
-        .pipe(sassLint())
-        .pipe(sassLint.format());
-
-});
 // SASS compilation
-gulp.task('sass:compile', ['sass:lint'], () => {
+gulp.task('sass:compile', () => {
 
     var watches = config.watches.styles;
 
@@ -223,12 +205,6 @@ gulp.task('sass:compile', ['sass:lint'], () => {
         }))
         .pipe($.sourcemaps.write())
         .pipe(gulp.dest(config.target.styles))
-        .pipe(gulpStylelint({
-            reporters: [{
-                formatter: 'string',
-                console: true
-            }]
-        }))
         .pipe(reload({
             stream: true
         }));
@@ -246,14 +222,18 @@ gulp.task('clean', () => {
 });
 
 // Gulp serve task
-gulp.task('serve', ["ssg:precompile", "doc:markdown"<%
+gulp.task('serve', ["ssg:precompile", "doc:markdown"
+    <%
     if(includeSASS){
-        %>, "sass:compile"<%
+        %>, "sass:compile"
+    <%
     }
     if(includeTypeScript){
-        %>, 'ts:compile'<%
+        %>, 'ts:compile'
+    <%
     }
-%>], () => {
+%>
+], () => {
 
     // start browser sync
     browserSync(config.server);
