@@ -349,10 +349,12 @@ module.exports = class extends Generator {
             filename += '.css';
         }
 
+        /** Style Linter Disable Research needed
         this.fs.copy(
             this.templatePath('.stylelintrc'),
             this.destinationPath('.stylelintrc')
         );
+         */
 
         this.fs.copy(
             this.templatePath('main.scss'),
