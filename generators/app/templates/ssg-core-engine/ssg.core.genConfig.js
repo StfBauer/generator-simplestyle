@@ -151,6 +151,7 @@ module.exports = {
                 chalk.green('Patterns after:  '), patternsData.length);
 
             writeConfigToFile();
+
         };
 
         var loadConfig = (function() {
